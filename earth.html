@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blurred Blue Marble Rotation</title>
+    <!--
+        This CSS creates a full-screen, ASMR-inspired animation of a softly
+        blurred Earth. It features a deep cosmic background, a rotating Earth
+        with glowing and shifting cloud patterns, designed for tranquility.
+        Utilizes CSS transforms, radial gradients, filters for blur, and animations
+        for a mesmerizing, seamless loop.
+    -->
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden; /* Prevent scrollbars for a clean full-screen experience */
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* Deep cosmic background: inky black to midnight blue with faint twinkling stars */
+            background: radial-gradient(circle at center, #0a0a1a 0%, #000000 80%),
+                        url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><circle cx="10" cy="10" r="1" fill="rgba(255,255,255,0.3)"/><circle cx="50" cy="50" r="0.5" fill="rgba(255,255,255,0.2)"/><circle cx="90" cy="20" r="0.8" fill="rgba(255,255,255,0.4)"/><circle cx="20" cy="80" r="0.6" fill="rgba(255,255,255,0.25)"/></svg>') repeat;
+            background-size: cover, 100px 100px; /* Cover for gradient, tile for stars */
+            perspective: 1000px; /* Enable 3D transforms for subtle depth */
+        }
+
+        /*
+            Main container for the Earth and its atmospheric effects.
+            Centered on the screen.
+        */
+        .earth-container {
+            position: relative;
+            width: 50vmin; /* Responsive size for the overall Earth system */
+            height: 50vmin;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transform-style: preserve-3d; /* Allows for 3D rotation of nested elements if added */
+        }
+
+        /*
+            The Earth element itself.
+            Styled as a sphere with a blurred texture and glowing effects.
+        */
+        .earth {
+            position: absolute;
+            width: 100%; /* Take full size of its container */
+            height: 100%;
+            border-radius: 50%; /* Perfect spherical shape */
+            will-change: transform, background, filter, box-shadow; /* Optimize for animation */
+
+            /*
+                Complex radial gradient to simulate Earth's "Blue Marble" view.
+                This gradient includes blues for oceans, greens/browns for land,
+                and whites for clouds, softened and blended.
+                The `background-size` is larger to allow for scrolling/shifting,
+                mimicking cloud movement.
+            */
+            background: radial-gradient(circle at 50% 50%,
+                #d3f8f9 0%,      /* Bright white for cloud highlights */
+                #a0e9f0 15%,     /* Pale blue for atmospheric haze */
+                #6495ed 30%,     /* Cornflower Blue (deeper ocean) */
+                #20b2aa 45%,     /* Light Sea Green (coastal/land-water blend) */
+                #3cb371 60%,     /* Medium Sea Green (landmass) */
+                #4682b4 75%,     /* Steel Blue (ocean depth) */
+                #1e90ff 90%      /* Dodger Blue (deep ocean/shadowed areas) */
+            );
+            background-size: 200% 200%; /* Larger background to animate movement */
+            background-position: 50% 50%; /* Initial centered position */
+
+            /*
+                Gentle blur for the dreamy, ethereal "Blue Marble" effect.
+            */
+            filter: blur(8px) contrast(1.1); /* Blur for softness, contrast to retain color vibrancy */
+
+            /*
+                Subtle atmospheric glow and general radiance.
+            */
+            box-shadow: 0 0 50px rgba(0, 191, 255, 0.4), /* Deep sky blue glow */
+                        0 0 80px rgba(255, 255, 255, 0.1), /* Ambient white glow */
+                        inset 0 0 20px rgba(255, 255, 255, 0.2); /* Inner highlight */
+
+            /*
+                Main animations: rotation and subtle cloud pattern shift.
+                Now uses rotateZ() for a flat, disc-like spin.
+            */
+            transform: rotateX(0deg); /* No X-axis tilt if rotating on Z */
+            animation: rotateEarth 8s linear infinite,
+                       cloudShift 20s linear infinite alternate; /* Slower, subtle cloud shift */
+        }
+
+        /*
+            Keyframe animation for the Earth's smooth rotation around its Z-axis.
+        */
+        @keyframes rotateEarth {
+            0% { transform: rotateZ(0deg); }
+            100% { transform: rotateZ(360deg); }
+        }
+
+        /*
+            Keyframe animation for the subtle shifting of cloud patterns/surface details.
+            Animates the background-position of the radial gradient.
+        */
+        @keyframes cloudShift {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 100% 100%; }
+        }
+
+        /* Responsive adjustments for smaller screens */
+        @media (max-width: 768px) {
+            .earth-container {
+                width: 70vmin; /* Larger on mobile to fill more space */
+                height: 70vmin;
+            }
+            .earth {
+                filter: blur(5px) contrast(1.1); /* Slightly less blur for performance */
+                box-shadow: 0 0 30px rgba(0, 191, 255, 0.3),
+                            0 0 60px rgba(255, 255, 255, 0.08),
+                            inset 0 0 15px rgba(255, 255, 255, 0.15);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="earth-container">
+        <div class="earth"></div>
+    </div>
+</body>
+</html>

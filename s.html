@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fractal Bloom</title>
+    <!--
+        This CSS creates a full-screen, ASMR-inspired animation featuring a fractal
+        pattern that blooms and collapses recursively. It uses layered div elements
+        with CSS transforms (scale and rotate), linear gradients for color,
+        blur filters for softness, and staggered animations for depth, all
+        within a seamless, hypnotic loop.
+    -->
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden; /* Prevent scrollbars for a clean full-screen experience */
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* Soft, dark cosmic background: deep navy with faint gradient */
+            background: radial-gradient(circle at center, #1a1a2e 0%, #0a0a1a 70%);
+        }
+
+        /*
+            Main container for the fractal bloom.
+            It's centered on the screen and provides the relative positioning context
+            for all the fractal layers.
+        */
+        .fractal-container {
+            position: relative;
+            width: 80vmin; /* Responsive size based on viewport smaller dimension */
+            height: 80vmin;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%; /* Gives a circular boundary for the bloom */
+            overflow: hidden; /* Ensure elements outside the circular boundary are clipped */
+            /* Subtle shadow to give depth */
+            box-shadow: 0 0 100px rgba(0, 0, 0, 0.3) inset;
+        }
+
+        /*
+            Styling for an individual fractal layer.
+            Each layer is a div that will be transformed to create the blooming effect.
+        */
+        .fractal-layer {
+            position: absolute;
+            width: 100%; /* Take full width of its container initially */
+            height: 100%; /* Take full height of its container initially */
+            border-radius: 50%; /* Circular base for layers */
+            opacity: 0.9; /* Slight transparency for layering and blending */
+            will-change: transform, filter, background; /* Optimize for animation performance */
+            transform-origin: center center; /* Ensure transformations are from the center */
+
+            /*
+                mix-blend-mode: screen creates luminous overlapping effects,
+                where colors combine to create brighter, new hues on a dark background.
+            */
+            mix-blend-mode: screen;
+            /* Apply a significant blur for soft, dreamy edges */
+            filter: blur(20px);
+
+            /* Default animation properties, overridden per layer below */
+            animation: bloomScale 7s ease-in-out infinite alternate,
+                       bloomRotate 7s ease-in-out infinite alternate,
+                       colorShift 10s linear infinite;
+            background-size: 200% 200%; /* Larger background size for color shift animation */
+        }
+
+        /* Define specific color gradients for each layer, subtly shifting hues */
+        .fractal-layer:nth-child(1) {
+            background: linear-gradient(135deg, #2ecc71, #8e44ad, #ff6347); /* Emerald, Amethyst, Coral */
+        }
+        .fractal-layer:nth-child(2) {
+            background: linear-gradient(45deg, #8e44ad, #ff6347, #2ecc71);
+            transform: scale(0.9); /* Smaller initial size */
+            filter: blur(18px);
+            opacity: 0.8;
+            animation-delay: -1s; /* Staggered delay */
+        }
+        .fractal-layer:nth-child(3) {
+            background: linear-gradient(225deg, #ff6347, #2ecc71, #8e44ad);
+            transform: scale(0.8);
+            filter: blur(15px);
+            opacity: 0.7;
+            animation-delay: -2s;
+        }
+        .fractal-layer:nth-child(4) {
+            background: linear-gradient(315deg, #2ecc71, #8e44ad, #ff6347);
+            transform: scale(0.7);
+            filter: blur(12px);
+            opacity: 0.6;
+            animation-delay: -3s;
+        }
+        .fractal-layer:nth-child(5) {
+            background: linear-gradient(90deg, #8e44ad, #ff6347, #2ecc71);
+            transform: scale(0.6);
+            filter: blur(10px);
+            opacity: 0.5;
+            animation-delay: -4s;
+        }
+
+        /*
+            Keyframe animation for the "blooming" scale effect.
+            Causes layers to expand and contract.
+        */
+        @keyframes bloomScale {
+            0%, 100% { transform: scale(0.05); } /* Start very small (almost invisible) */
+            25% { transform: scale(0.7); }
+            50% { transform: scale(1.0); } /* Bloom to full size */
+            75% { transform: scale(0.7); }
+        }
+
+        /*
+            Keyframe animation for the "opening" rotation effect.
+            Causes layers to rotate to simulate petals opening/closing.
+        */
+        @keyframes bloomRotate {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(45deg); } /* Rotate outward */
+            50% { transform: rotate(90deg); } /* Max rotation */
+            75% { transform: rotate(45deg); }
+        }
+
+        /*
+            Keyframe animation for subtle color shifts within the gradient,
+            adding dynamism to the metallic sheen.
+        */
+        @keyframes colorShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Responsive adjustments for smaller screens */
+        @media (max-width: 768px) {
+            .fractal-container {
+                width: 95vmin;
+                height: 95vmin;
+            }
+            .fractal-layer {
+                filter: blur(12px); /* Slightly less blur on mobile for performance */
+            }
+            .fractal-layer:nth-child(2) { filter: blur(10px); }
+            .fractal-layer:nth-child(3) { filter: blur(8px); }
+            .fractal-layer:nth-child(4) { filter: blur(6px); }
+            .fractal-layer:nth-child(5) { filter: blur(4px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="fractal-container">
+        <!-- Multiple layered div elements to create the recursive fractal effect -->
+        <div class="fractal-layer layer-1"></div>
+        <div class="fractal-layer layer-2"></div>
+        <div class="fractal-layer layer-3"></div>
+        <div class="fractal-layer layer-4"></div>
+        <div class="fractal-layer layer-5"></div>
+    </div>
+</body>
+</html>

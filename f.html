@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Twisting Velvet Rope</title>
+    <!--
+        This CSS creates a full-screen, ASMR-inspired animation featuring a
+        single "velvet rope" that twists continuously, evoking a calming,
+        tactile sensation. It uses CSS transforms for 3D rotation,
+        box-shadow for depth and texture, and a smooth, infinite animation loop.
+    -->
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden; /* Prevent scrollbars for a clean full-screen experience */
+            background-color: #1a1a2e; /* Deep dark blue-purple background for contrast */
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* Enable 3D transformations on the parent for proper perspective */
+            perspective: 800px; /* Stronger perspective for a more pronounced 3D twist */
+        }
+
+        /*
+            Container for the velvet rope. This helps center the rope and
+            provides a context for its 3D transformations.
+        */
+        .rope-container {
+            position: relative;
+            width: 150px; /* Width of the rope itself */
+            height: 100vh; /* Make the rope span the full viewport height */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* Apply a slight filter to the container for overall softness and depth */
+            filter: drop-shadow(0 0 20px rgba(0, 0, 0, 0.5));
+            transform-style: preserve-3d; /* Crucial for nested 3D transforms */
+        }
+
+        /*
+            The velvet rope element itself.
+            It's a div that will be shaped and animated to look like a twisting rope.
+        */
+        .velvet-rope {
+            position: absolute;
+            width: 100%; /* Take full width of its container (150px) */
+            height: 100%; /* Take full height of its container (100vh) */
+            border-radius: 75px; /* Half of width to make it a perfect capsule/cylinder shape */
+            /*
+                A rich, soothing color. Using a linear gradient for a subtle light-dark variation
+                across the rope's width, enhancing the 3D cylindrical look.
+            */
+            background: linear-gradient(to right, #6a053f 0%, #a30b6e 50%, #6a053f 100%); /* Deep burgundy gradient */
+
+            /*
+                Multiple box-shadows to create a plush, velvety texture and depth.
+                - Inner shadows simulate highlights and shadows on the cylindrical surface.
+                - Outer shadows give it a subtle glow and softness.
+            */
+            box-shadow:
+                inset 0 0 20px rgba(255, 255, 255, 0.3),  /* Inner highlight top */
+                inset 0 0 20px rgba(0, 0, 0, 0.4),      /* Inner shadow bottom */
+                0 0 50px rgba(163, 11, 110, 0.5),         /* Outer glow matching color */
+                0 0 80px rgba(0, 0, 0, 0.7);            /* Stronger shadow behind */
+
+            /* Apply a subtle blur for extra softness, mimicking velvet fuzz */
+            filter: blur(2px);
+
+            /* Optimize for animation performance */
+            will-change: transform;
+
+            /*
+                Animation for the 3D twisting effect.
+                - 'twistRope' is the keyframe animation name.
+                - 10s is the duration (slow and calming).
+                - linear ensures constant speed for a hypnotic effect.
+                - infinite makes it loop endlessly.
+            */
+            animation: twistRope 10s linear infinite;
+        }
+
+        /*
+            Keyframe animation for the 3D twisting motion.
+            It rotates the rope around its Y-axis from 0 to 360 degrees.
+            This creates the illusion of the rope twisting on its own axis.
+        */
+        @keyframes twistRope {
+            0% { transform: rotateY(0deg); }
+            100% { transform: rotateY(360deg); }
+        }
+
+        /* Responsive adjustments for smaller screens */
+        @media (max-width: 768px) {
+            .rope-container {
+                width: 100px; /* Slightly thinner rope on mobile */
+            }
+            .velvet-rope {
+                border-radius: 50px; /* Adjust border-radius for new width */
+                box-shadow:
+                    inset 0 0 15px rgba(255, 255, 255, 0.3),
+                    inset 0 0 15px rgba(0, 0, 0, 0.4),
+                    0 0 30px rgba(163, 11, 110, 0.5),
+                    0 0 50px rgba(0, 0, 0, 0.7);
+                filter: blur(1px); /* Slightly less blur for mobile performance */
+            }
+            /* You might adjust animation duration for mobile if needed, e.g., to 8s */
+            /* animation: twistRope 8s linear infinite; */
+        }
+    </style>
+</head>
+<body>
+    <div class="rope-container">
+        <div class="velvet-rope"></div>
+    </div>
+</body>
+</html>

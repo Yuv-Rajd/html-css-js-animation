@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glassmorphic Ripple</title>
+    <!--
+        This CSS creates a full-screen, ASMR-inspired animation featuring
+        frosted glass-like panels that ripple and shift. It uses backdrop-filter
+        for the glassmorphic effect, CSS transforms for wave-like motion,
+        and staggered animations for a fluid, continuous loop.
+    -->
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden; /* Prevent scrollbars for a clean full-screen experience */
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* Soft gradient background: pale blue to lavender */
+            background: linear-gradient(135deg, #e0f2f7 0%, #d4e7f7 50%, #e6d3f2 100%);
+        }
+
+        /*
+            Main container for all the glass panels.
+            It spans the entire screen and serves as the canvas for the ripples.
+        */
+        .ripple-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden; /* Ensure panels are clipped when out of bounds */
+        }
+
+        /*
+            Styling for an individual glass panel.
+            These are rectangular divs with rounded corners, translucency, and blur.
+        */
+        .glass-panel {
+            position: absolute;
+            width: 250px; /* Base width of the panel */
+            height: 150px; /* Base height of the panel */
+            border-radius: 25px; /* Rounded corners for a soft look */
+            background: rgba(255, 255, 255, 0.15); /* Semi-transparent white background */
+            border: 1px solid rgba(255, 255, 255, 0.2); /* Subtle light border */
+            /* Crucial for the glassmorphic effect: blurs content behind the element */
+            backdrop-filter: blur(15px); /* Strong blur for frosted glass */
+            -webkit-backdrop-filter: blur(15px); /* For Safari compatibility */
+            opacity: 0.9; /* Slight transparency */
+            will-change: transform, opacity; /* Optimize for animation performance */
+            /* Subtle box-shadow for depth and a soft, diffused glow */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1),
+                        0 0 30px rgba(255, 255, 255, 0.2) inset; /* Inner highlight */
+            /* mix-blend-mode can enhance overlapping effect */
+            mix-blend-mode: normal; /* Normal blend mode works well with rgba and blur */
+
+            /* Default animation properties, duration and delay set by JavaScript */
+            animation: rippleFlow var(--duration) ease-in-out infinite alternate;
+        }
+
+        /* Define subtle color shifts for panels */
+        .glass-panel:nth-child(even) {
+            background: rgba(255, 192, 203, 0.1); /* Hint of pastel pink */
+            border: 1px solid rgba(255, 192, 203, 0.2);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1),
+                        0 0 30px rgba(255, 192, 203, 0.2) inset;
+        }
+        .glass-panel:nth-child(odd) {
+            background: rgba(127, 255, 212, 0.1); /* Hint of aqua */
+            border: 1px solid rgba(127, 255, 212, 0.2);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1),
+                        0 0 30px rgba(127, 255, 212, 0.2) inset;
+        }
+
+        /*
+            Keyframe animation for the ripple flow.
+            It simulates wave-like horizontal and vertical movement,
+            and subtle scaling for depth.
+        */
+        @keyframes rippleFlow {
+            0% {
+                transform: translate(-100%, -50%) scale(1);
+                opacity: 0.7;
+            }
+            25% {
+                transform: translate(20%, 10%) scale(1.05);
+                opacity: 1;
+            }
+            50% {
+                transform: translate(120%, -30%) scale(0.95);
+                opacity: 0.7;
+            }
+            75% {
+                transform: translate(50%, 40%) scale(1.03);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(-100%, -50%) scale(1); /* Return to start, creating a loop */
+                opacity: 0.7;
+            }
+        }
+
+        /* Responsive adjustments for smaller screens (e.g., mobile devices) */
+        @media (max-width: 768px) {
+            .glass-panel {
+                width: 180px; /* Smaller panels on mobile */
+                height: 100px;
+                border-radius: 20px;
+                backdrop-filter: blur(10px); /* Slightly less blur for performance */
+                -webkit-backdrop-filter: blur(10px);
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1),
+                            0 0 20px rgba(255, 255, 255, 0.15) inset;
+            }
+            /* Adjust keyframe translate values for mobile to keep within bounds */
+            @keyframes rippleFlow {
+                0% { transform: translate(-120%, -30%) scale(1); opacity: 0.7; }
+                25% { transform: translate(10%, 15%) scale(1.05); opacity: 1; }
+                50% { transform: translate(100%, -20%) scale(0.95); opacity: 0.7; }
+                75% { transform: translate(30%, 25%) scale(1.03); opacity: 1; }
+                100% { transform: translate(-120%, -30%) scale(1); opacity: 0.7; }
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="ripple-container">
+        <!-- Multiple glass panels for the ripple effect -->
+        <div class="glass-panel"></div>
+        <div class="glass-panel"></div>
+        <div class="glass-panel"></div>
+        <div class="glass-panel"></div>
+        <div class="glass-panel"></div>
+        <div class="glass-panel"></div>
+        <div class="glass-panel"></div>
+        <div class="glass-panel"></div>
+    </div>
+
+    <script>
+        const rippleContainer = document.querySelector('.ripple-container');
+        const panels = document.querySelectorAll('.glass-panel');
+
+        const MIN_DURATION = 8; // seconds
+        const MAX_DURATION = 12; // seconds
+        const NUM_PANELS = 8; // Number of panels to ensure continuous flow
+
+        /**
+         * Initializes and sets animation properties for each panel.
+         * This ensures varied starting points and speeds for the ripple effect.
+         */
+        function initializePanels() {
+            panels.forEach((panel, index) => {
+                const duration = Math.random() * (MAX_DURATION - MIN_DURATION) + MIN_DURATION;
+                // Staggered delay to ensure panels don't all start at once
+                const delay = (index * (duration / NUM_PANELS)) - (duration / 2); // Start some panels mid-animation
+
+                panel.style.setProperty('--duration', `${duration}s`);
+                panel.style.animationDelay = `${delay}s`;
+            });
+        }
+
+        // Call initialization function when the window loads
+        window.onload = initializePanels;
+    </script>
+</body>
+</html>

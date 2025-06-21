@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jupiter and its Moons Animation</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<style>
+    body {
+  margin: 0;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #0a0a23;
+  overflow: hidden;
+}
+.container {
+  width: 100%;
+  height: 100%;
+  max-width: 1200px;
+  max-height: 600px;
+  position: relative;
+}
+svg {
+  width: 100%;
+  height: 100%;
+}
+.jupiter {
+  animation: pulse 10s infinite ease-in-out;
+}
+.clouds {
+  opacity: 0.5;
+  animation: swirl 12s infinite linear;
+}
+.moon {
+  animation: orbit 8s infinite linear;
+}
+.europa { animation-duration: 6s; }
+.io { animation-duration: 7s; animation-delay: 1s; }
+.ganymede { animation-duration: 9s; animation-delay: 2s; }
+.star {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: #fff;
+  border-radius: 50%;
+  filter: blur(1px);
+  animation: twinkle 5s infinite ease-in-out;
+}
+.star:nth-child(2) { top: 10%; left: 20%; animation-delay: 1s; }
+.star:nth-child(3) { top: 70%; left: 80%; animation-delay: 2s; }
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+@keyframes swirl {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-200); }
+}
+@keyframes orbit {
+  0% { transform: translate(0, 0) rotate(0deg) translateX(200px) rotate(0deg); }
+  100% { transform: translate(0, 0) rotate(360deg) translateX(200px) rotate(-360deg); }
+}
+@keyframes twinkle {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+@media (max-width: 768px) {
+  .container { max-height: 400px; }
+  .moon { animation-duration: 5s; }
+}
+</style>
+<body>
+  <div class="container">
+    <svg width="100%" height="100%" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid slice">
+      <defs>
+        <radialGradient id="jupiterGradient" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" style="stop-color:#f4d9a6;stop-opacity:1" />
+          <stop offset="70%" style="stop-color:#d68a5a;stop-opacity:1" />
+          <stop offset="100%" style="stop-color:#8b3a2b;stop-opacity:1" />
+        </radialGradient>
+        <linearGradient id="cloudGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" style="stop-color:#fff;stop-opacity:0.3" />
+          <stop offset="100%" style="stop-color:#d68a5a;stop-opacity:0.2" />
+          <animate attributeName="x1" from="0%" to="100%" dur="10s" repeatCount="indefinite" />
+          <animate attributeName="x2" from="100%" to="200%" dur="10s" repeatCount="indefinite" />
+        </linearGradient>
+        <filter id="glow">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="3" />
+        </filter>
+      </defs>
+      <rect width="100%" height="100%" fill="#0a0a23" />
+      <circle cx="500" cy="300" r="150" fill="url(#jupiterGradient)" class="jupiter" />
+      <path d="M500 300 M350 300 A150 100 0 0 1 650 300 A150 100 0 0 1 350 300" fill="url(#cloudGradient)" class="clouds" />
+      <circle cx="700" cy="300" r="20" fill="#4a90e2" class="moon europa" filter="url(#glow)" />
+      <circle cx="800" cy="300" r="15" fill="#d0021b" class="moon io" filter="url(#glow)" />
+      <circle cx="600" cy="300" r="25" fill="#7f8c8d" class="moon ganymede" filter="url(#glow)" />
+    </svg>
+    <div class="star"></div>
+    <div class="star"></div>
+  </div>
+</body>
+</html>

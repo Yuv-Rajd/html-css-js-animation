@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gradient Wave Flow (SVG)</title>
+    <!--
+        This CSS sets up a full-screen background and centers an SVG container.
+        The SVG contains multiple wave paths that are animated using CSS transforms
+        and styled with linear gradients and blur filters to create a soft, flowing
+        gradient wave effect.
+    -->
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden; /* Prevent scrollbars */
+            background-color: #0d0d0d; /* Dark background */
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Container for the SVG to ensure it scales correctly */
+        .svg-wave-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden; /* Clip waves at the edges */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Styling for the SVG element itself */
+        svg {
+            display: block;
+            width: 100%; /* Make SVG fill its container */
+            height: 100%;
+            /* Optional: Apply a global blur to the SVG for overall softness,
+               though individual wave blurs are also applied. */
+            filter: blur(15px); /* Moderate blur for the entire SVG */
+        }
+
+        /*
+            Define the linear gradient for the SVG waves.
+            This gradient is applied to the 'fill' property of the SVG paths.
+        */
+        #waveGradient {
+            /* Using a vertical gradient within the SVG */
+            /* Stops define the color progression */
+            stop:nth-child(1) { stop-color: #89cff0; } /* Pastel Blue */
+            stop:nth-child(2) { stop-color: #a796e6; } /* Soft Lavender */
+            stop:nth-child(3) { stop-color: #da7ed6; } /* Muted Magenta */
+            stop:nth-child(4) { stop-color: #f29c9c; } /* Light Coral Pink */
+        }
+
+        /*
+            Base styling for all wave paths.
+            Each path uses the defined linear gradient and has a filter for softness.
+            Opacity is reduced for a translucent, ethereal look.
+        */
+        .wave-path {
+            fill: url(#waveGradient); /* Apply the gradient defined above */
+            opacity: 0.7; /* Slightly transparent */
+            will-change: transform; /* Optimize for transform animations */
+            transform-origin: center center; /* Ensure transformations are centered */
+            /* Individual blur for each wave, contributing to the overall softness */
+            filter: blur(50px); /* Significant blur for soft edges on individual waves */
+        }
+
+        /*
+            Animation definitions for each wave.
+            Each wave has a slightly different animation duration and delay
+            to create a complex, non-repeating flow.
+        */
+
+        /* Wave 1: Slow horizontal shift */
+        #wave1 {
+            animation: waveHorizontal 30s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        }
+
+        /* Wave 2: Faster horizontal shift with a slight vertical bounce */
+        #wave2 {
+            animation: waveHorizontal 25s cubic-bezier(0.6, 0, 0.4, 1) infinite,
+                       waveVertical 15s ease-in-out infinite alternate;
+            opacity: 0.6; /* Slightly more transparent */
+            transform-origin: 20% 50%; /* Different origin for distinct movement */
+        }
+
+        /* Wave 3: Moderate horizontal shift with a different vertical bounce */
+        #wave3 {
+            animation: waveHorizontal 35s cubic-bezier(0.8, 0, 0.2, 1) infinite,
+                       waveVertical 18s ease-in-out infinite alternate-reverse;
+            opacity: 0.8; /* Slightly less transparent */
+            transform-origin: 80% 50%; /* Another origin for distinct movement */
+        }
+
+        /* Wave 4: Faster and larger horizontal shift */
+        #wave4 {
+            animation: waveHorizontal 20s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+            opacity: 0.5; /* Most transparent */
+            transform-origin: 50% 50%;
+        }
+
+        /* Keyframe animation for horizontal movement */
+        @keyframes waveHorizontal {
+            0% { transform: translateX(-50%); }
+            100% { transform: translateX(50%); }
+        }
+
+        /* Keyframe animation for subtle vertical movement (ripple effect) */
+        @keyframes waveVertical {
+            0% { transform: translateY(-10px); }
+            100% { transform: translateY(10px); }
+        }
+
+        /* Responsive adjustments for smaller screens */
+        @media (max-width: 768px) {
+            svg {
+                filter: blur(10px); /* Less global blur for mobile performance */
+            }
+            .wave-path {
+                filter: blur(30px); /* Less individual wave blur */
+                opacity: 0.6;
+            }
+            /* Adjust horizontal wave speed for mobile to feel appropriate */
+            @keyframes waveHorizontal {
+                0% { transform: translateX(-70%); } /* More movement range */
+                100% { transform: translateX(70%); }
+            }
+            /* Adjust vertical wave speed for mobile */
+            @keyframes waveVertical {
+                0% { transform: translateY(-5px); }
+                100% { transform: translateY(5px); }
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="svg-wave-container">
+        <!--
+            SVG element to draw and animate the waves.
+            - viewBox defines the internal coordinate system.
+            - preserveAspectRatio ensures it scales correctly.
+        -->
+        <svg viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid slice">
+            <!--
+                SVG Definitions: Gradients and filters.
+                - defs allows reusable assets.
+                - linearGradient defines the color transitions for the waves.
+                  x1, y1, x2, y2 define the gradient direction (here, vertical from top to bottom).
+                - stop elements define the colors at different points along the gradient.
+            -->
+            <defs>
+                <linearGradient id="waveGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" style="stop-color:#89cff0" />      <!-- Pastel Blue -->
+                    <stop offset="30%" style="stop-color:#a796e6" />     <!-- Soft Lavender -->
+                    <stop offset="65%" style="stop-color:#da7ed6" />     <!-- Muted Magenta -->
+                    <stop offset="100%" style="stop-color:#f29c9c" />    <!-- Light Coral Pink -->
+                </linearGradient>
+            </defs>
+
+            <!--
+                SVG Paths representing the wave shapes.
+                - Each path uses a 'd' attribute with SVG path commands (M for moveto, C for curveto).
+                - They are designed to slightly overlap to create a mixing effect.
+                - Each path has a unique ID for individual animation targeting.
+                - Class 'wave-path' applies common styling (gradient fill, opacity, blur).
+            -->
+
+            <!-- Wave 1: Broad, gentle wave -->
+            <path id="wave1" class="wave-path"
+                  d="M0,300 C200,200 400,400 600,300 C800,200 1000,400 1000,300 L1000,600 L0,600 Z" />
+
+            <!-- Wave 2: Slightly more defined, layered wave -->
+            <path id="wave2" class="wave-path"
+                  d="M0,350 C150,450 350,250 500,350 C650,450 850,250 1000,350 L1000,600 L0,600 Z" />
+
+            <!-- Wave 3: Another gentle wave, slightly offset -->
+            <path id="wave3" class="wave-path"
+                  d="M0,250 C250,350 500,150 750,250 C900,300 1000,200 1000,250 L1000,600 L0,600 Z" />
+
+            <!-- Wave 4: More subtle, at the top -->
+            <path id="wave4" class="wave-path"
+                  d="M0,200 C100,280 300,120 500,200 C700,280 900,120 1000,200 L1000,600 L0,600 Z" />
+
+        </svg>
+    </div>
+</body>
+</html>

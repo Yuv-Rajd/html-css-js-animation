@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bouncing Gravity Balls</title>
+    <!--
+        This CSS creates a full-screen, ASMR-inspired animation featuring
+        multiple colorful balls bouncing rhythmically. It uses CSS transforms
+        and cubic-bezier timing functions for realistic gravity-driven motion,
+        radial gradients for ball depth, and staggered animations for dynamic patterns.
+    -->
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden; /* Prevent scrollbars for a clean full-screen experience */
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* Soft gradient background: pastel pinks to blues */
+            background: linear-gradient(135deg, #f7d9e4 0%, #a7e9af 50%, #89cff0 100%);
+        }
+
+        /*
+            Container for all the bouncing balls.
+            It spans the entire screen and serves as the stage for the animation.
+        */
+        .balls-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden; /* Ensure balls are clipped if they go out of bounds */
+        }
+
+        /*
+            Styling for an individual ball.
+            Each ball is a circular div with a radial gradient for depth and a subtle shadow.
+        */
+        .ball {
+            position: absolute;
+            bottom: 0; /* Position the ball at the bottom of the container */
+            width: 80px; /* Default size of the ball */
+            height: 80px;
+            border-radius: 50%; /* Makes the div perfectly circular */
+            /* Radial gradient for a spherical, 3D appearance */
+            background: radial-gradient(circle at 30% 30%, #ffffff, var(--ball-color));
+            /* Subtle box-shadow for a soft glow and ground shadow effect */
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3), /* Ground shadow */
+                        0 0 15px rgba(255, 255, 255, 0.2) inset; /* Inner highlight */
+            will-change: transform; /* Optimize for animation performance */
+
+            /* Default animation properties, overridden via specific classes/inline styles */
+            animation: bounce 3s ease-in-out infinite;
+        }
+
+        /* Define specific colors for each ball using CSS custom properties */
+        .ball:nth-child(1) { --ball-color: #ff6347; left: 10%; animation-delay: 0s; animation-duration: 3s; } /* Coral */
+        .ball:nth-child(2) { --ball-color: #66cdaa; left: 25%; animation-delay: 0.5s; animation-duration: 3.2s; } /* Medium Aquamarine (Mint) */
+        .ball:nth-child(3) { --ball-color: #b19cd9; left: 40%; animation-delay: 1s; animation-duration: 2.8s; } /* Lavender */
+        .ball:nth-child(4) { --ball-color: #ffd700; left: 55%; animation-delay: 1.5s; animation-duration: 3.5s; } /* Gold */
+        .ball:nth-child(5) { --ball-color: #ff69b4; left: 70%; animation-delay: 2s; animation-duration: 3.1s; } /* Hot Pink */
+        .ball:nth-child(6) { --ball-color: #00bfff; left: 85%; animation-delay: 2.5s; animation-duration: 2.9s; } /* Deep Sky Blue */
+
+        /*
+            Keyframe animation for the bouncing effect.
+            - transform: translateY moves the ball up and down.
+            - cubic-bezier for 'ease-in' on the way down and 'ease-out' on the way up,
+              mimicking realistic gravity. The values simulate acceleration and deceleration.
+            - At 0% and 100%, the ball is at its starting (bottom) position.
+            - At 50%, the ball is at the peak of its bounce.
+        */
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0); /* On the "ground" (bottom of the container) */
+            }
+            50% {
+                /* Bounce up to a height relative to the viewport height, adjusted by ball's own height */
+                transform: translateY(calc(-100vh + 80px)); /* Bounce up, 80px is ball height */
+            }
+        }
+
+        /* Responsive adjustments for smaller screens (e.g., mobile devices) */
+        @media (max-width: 768px) {
+            .ball {
+                width: 50px; /* Smaller balls on mobile */
+                height: 50px;
+                /* Adjust ground shadow for smaller size */
+                box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3),
+                            0 0 10px rgba(255, 255, 255, 0.2) inset;
+            }
+            /* Adjust bounce height relative to mobile viewport */
+            @keyframes bounce {
+                0%, 100% {
+                    transform: translateY(0);
+                }
+                50% {
+                    /* Adjusted for smaller ball size on mobile */
+                    transform: translateY(calc(-100vh + 50px));
+                }
+            }
+            /* Adjust horizontal positions for better mobile layout */
+            .ball:nth-child(1) { left: 5%; }
+            .ball:nth-child(2) { left: 20%; }
+            .ball:nth-child(3) { left: 35%; }
+            .ball:nth-child(4) { left: 50%; }
+            .ball:nth-child(5) { left: 65%; }
+            .ball:nth-child(6) { left: 80%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="balls-container">
+        <!-- Multiple ball elements, each with a distinct color and animation timing -->
+        <div class="ball"></div>
+        <div class="ball"></div>
+        <div class="ball"></div>
+        <div class="ball"></div>
+        <div class="ball"></div>
+        <div class="ball"></div>
+    </div>
+</body>
+</html>

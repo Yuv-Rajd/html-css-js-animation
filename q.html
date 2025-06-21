@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claymorphic Squeeze</title>
+    <!--
+        This CSS creates a full-screen, ASMR-inspired animation of a soft,
+        clay-like blob that gently squeezes and reforms. It uses CSS transforms
+        (scale and skew) for the morphing effect, radial gradients for a tactile
+        texture, and box-shadow for depth, all within a seamless loop.
+    -->
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden; /* Prevent scrollbars for a clean full-screen experience */
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f0f0f0; /* Soft cream minimalist background */
+        }
+
+        /*
+            Main container for the clay blob.
+            It's centered on the screen and acts as the stage for the animation.
+        */
+        .clay-container {
+            position: relative;
+            width: 70vmin; /* Responsive size based on viewport smaller dimension */
+            height: 70vmin;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /*
+            The clay blob element.
+            This div will be transformed to simulate squeezing and reforming.
+        */
+        .clay-blob {
+            position: absolute;
+            width: 100%; /* Take full width of its container */
+            height: 100%; /* Take full height of its container */
+            border-radius: 50%; /* Start as a circular blob base */
+            will-change: transform, box-shadow, background; /* Optimize for animation */
+            transform-origin: center center; /* Ensure transformations are from the center */
+
+            /*
+                Radial gradient for a soft, clay-like texture and subtle depth.
+                Uses multiple stops for a natural, earthy feel.
+            */
+            background: radial-gradient(circle at 30% 30%,
+                #ffe0b2 0%,    /* Lighter highlight (pale peach) */
+                #ffcc80 20%,    /* Main mid-tone (light orange/apricot) */
+                #ffb74d 50%,    /* Deeper mid-tone (orange) */
+                #e69138 80%,    /* Darker tone (terracotta-like) */
+                #bf702b 100%    /* Deepest shadow (dark terracotta) */
+            );
+
+            /*
+                Box shadow to enhance 3D tactile quality and mimic subtle shadows
+                as the blob deforms.
+            */
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2), /* Main shadow for depth */
+                        inset 0 5px 10px rgba(255, 255, 255, 0.3), /* Inner highlight */
+                        inset 0 -5px 10px rgba(0, 0, 0, 0.2); /* Inner shadow */
+            filter: blur(0.5px); /* Very slight blur for softness */
+
+            /*
+                Main animation for squeezing and reforming.
+                - 'claySqueeze' handles scale and skew transformations.
+                - 7s duration for a slow, calming pace (between 6-8 seconds).
+                - ease-in-out for smooth start and end of each phase.
+                - infinite alternate for a continuous, seamless loop.
+            */
+            animation: claySqueeze 7s ease-in-out infinite alternate;
+        }
+
+        /*
+            Keyframe animation for the clay blob's squeezing and reforming motion.
+            Combines scale (compress/expand) and skew (stretch/squash)
+            to create a pliable, dough-like deformation.
+        */
+        @keyframes claySqueeze {
+            0% {
+                transform: scale(1, 1) skew(0deg, 0deg); /* Original circular shape */
+                border-radius: 50%;
+                box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2),
+                            inset 0 5px 10px rgba(255, 255, 255, 0.3),
+                            inset 0 -5px 10px rgba(0, 0, 0, 0.2);
+            }
+            25% {
+                transform: scale(0.9, 1.1) skewY(5deg); /* Squeeze vertically, stretch horizontally */
+                border-radius: 40% 60% 40% 60% / 60% 40% 60% 40%; /* Slightly oval for squeeze */
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3),
+                            inset 0 8px 12px rgba(255, 255, 255, 0.4),
+                            inset 0 -8px 12px rgba(0, 0, 0, 0.3);
+            }
+            50% {
+                transform: scale(1.1, 0.9) skewX(5deg); /* Squeeze horizontally, stretch vertically */
+                border-radius: 60% 40% 60% 40% / 40% 60% 40% 60%; /* Other oval shape */
+                box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4),
+                            inset 0 10px 15px rgba(255, 255, 255, 0.5),
+                            inset 0 -10px 15px rgba(0, 0, 0, 0.4);
+            }
+            75% {
+                transform: scale(0.95, 0.95) skew(-5deg, -5deg); /* Compress slightly, twist */
+                border-radius: 50%; /* Return to more circular */
+                box-shadow: 0 18px 35px rgba(0, 0, 0, 0.25),
+                            inset 0 6px 11px rgba(255, 255, 255, 0.35),
+                            inset 0 -6px 11px rgba(0, 0, 0, 0.25);
+            }
+            100% {
+                transform: scale(1, 1) skew(0deg, 0deg); /* Back to original circular shape */
+                border-radius: 50%;
+                box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2),
+                            inset 0 5px 10px rgba(255, 255, 255, 0.3),
+                            inset 0 -5px 10px rgba(0, 0, 0, 0.2);
+            }
+        }
+
+        /* Responsive adjustments for smaller screens (e.g., mobile devices) */
+        @media (max-width: 768px) {
+            .clay-container {
+                width: 90vmin;
+                height: 90vmin;
+            }
+            .clay-blob {
+                filter: blur(0.3px); /* Slightly less blur for mobile performance */
+                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2),
+                            inset 0 3px 8px rgba(255, 255, 255, 0.3),
+                            inset 0 -3px 8px rgba(0, 0, 0, 0.2);
+            }
+            /* Adjust scale values for mobile to prevent overflow if needed */
+            @keyframes claySqueeze {
+                0% { transform: scale(1, 1) skew(0deg, 0deg); }
+                25% { transform: scale(0.95, 1.05) skewY(3deg); }
+                50% { transform: scale(1.05, 0.95) skewX(3deg); }
+                75% { transform: scale(0.98, 0.98) skew(-3deg, -3deg); }
+                100% { transform: scale(1, 1) skew(0deg, 0deg); }
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="clay-container">
+        <div class="clay-blob"></div>
+    </div>
+</body>
+</html>

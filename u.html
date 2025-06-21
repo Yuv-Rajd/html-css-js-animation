@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soap Bubble Drift</title>
+    <!--
+        This CSS sets up a full-screen, ASMR-inspired animation of iridescent
+        soap bubbles. Bubbles float, subtly pop, and reform. It uses div elements
+        for bubbles, conic-gradients for iridescence, CSS transforms for drifting
+        motion, and opacity for popping effects, all within a seamless loop.
+    -->
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden; /* Prevent scrollbars for a clean full-screen experience */
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* Soft pastel background: pale pink to light blue gradient */
+            background: linear-gradient(135deg, #fce4ec 0%, #e1f5fe 100%);
+        }
+
+        /*
+            Main container for all the soap bubbles.
+            It covers the entire screen and provides the stage for the drifting bubbles.
+        */
+        .bubble-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden; /* Ensure bubbles are clipped when out of bounds */
+        }
+
+        /*
+            Styling for an individual soap bubble.
+            These are circular divs with a conic-gradient for iridescent reflections.
+        */
+        .bubble {
+            position: absolute;
+            border-radius: 50%; /* Makes the div perfectly circular */
+            /* Conic gradient for rainbow-like iridescent reflections */
+            background: conic-gradient(
+                from 0deg at 50% 50%,
+                rgba(255, 255, 255, 0.4) 0%, /* White highlight */
+                rgba(173, 216, 230, 0.4) 15%, /* Pale blue */
+                rgba(255, 160, 122, 0.4) 30%, /* Light salmon (pinkish-orange) */
+                rgba(144, 238, 144, 0.4) 45%, /* Light green */
+                rgba(221, 160, 221, 0.4) 60%, /* Plum (purple) */
+                rgba(255, 255, 0, 0.4) 75%, /* Yellow */
+                rgba(255, 255, 255, 0.4) 90%  /* White highlight for full cycle */
+            );
+            /* Soft border to define the bubble edge */
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            /* Subtle box-shadow for depth and a slight glow */
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.3),
+                        0 0 20px rgba(255, 255, 255, 0.1) inset;
+            filter: blur(0.5px); /* Very slight blur for softness */
+            opacity: 0; /* Start invisible, controlled by JS for fade-in/pop */
+            will-change: transform, opacity; /* Optimize for animation performance */
+            pointer-events: none; /* Ensure bubbles don't interfere with interaction */
+
+            /* Default animation properties, duration and delay set by JavaScript */
+            animation: driftAndFloat var(--duration) ease-in-out infinite;
+        }
+
+        /*
+            Keyframe animation for the bubble's drifting and floating motion.
+            It defines a complex, organic path using multiple translate points
+            to simulate graceful movement across the screen.
+        */
+        @keyframes driftAndFloat {
+            0% {
+                transform: translate(var(--start-x), var(--start-y)) scale(0.8);
+                opacity: 0; /* Fade in from start */
+            }
+            10% {
+                opacity: 0.9; /* Fully visible */
+            }
+            25% {
+                transform: translate(var(--point1-x), var(--point1-y)) scale(1);
+            }
+            50% {
+                transform: translate(var(--point2-x), var(--point2-y)) scale(1.1);
+            }
+            75% {
+                transform: translate(var(--point3-x), var(--point3-y)) scale(0.9);
+            }
+            90% {
+                opacity: 0.9; /* Stay visible until near end */
+            }
+            100% {
+                transform: translate(var(--end-x), var(--end-y)) scale(0.8);
+                opacity: 0; /* Fade out at end to simulate pop/disappearance */
+            }
+        }
+
+        /* Responsive adjustments for smaller screens (e.g., mobile devices) */
+        @media (max-width: 768px) {
+            .bubble {
+                width: 60px; /* Smaller bubbles on mobile */
+                height: 60px;
+                border-width: 0.5px; /* Thinner border */
+                filter: blur(0.3px);
+                box-shadow: 0 0 5px rgba(255, 255, 255, 0.2),
+                            0 0 10px rgba(255, 255, 255, 0.08) inset;
+            }
+            /* Adjust translate values in driftAndFloat for mobile to keep movement within bounds */
+            @keyframes driftAndFloat {
+                0% { transform: translate(var(--start-x), var(--start-y)) scale(0.7); opacity: 0; }
+                10% { opacity: 0.9; }
+                25% { transform: translate(var(--point1-x), var(--point1-y)) scale(0.9); }
+                50% { transform: translate(var(--point2-x), var(--point2-y)) scale(1); }
+                75% { transform: translate(var(--point3-x), var(--point3-y)) scale(0.8); }
+                90% { opacity: 0.9; }
+                100% { transform: translate(var(--end-x), var(--end-y)) scale(0.7); opacity: 0; }
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bubble-container">
+        <!-- Soap bubbles will be dynamically added here by JavaScript -->
+    </div>
+
+    <script>
+        const bubbleContainer = document.querySelector('.bubble-container');
+
+        const NUM_BUBBLES = 30; // Number of bubbles to simulate simultaneously
+        const MIN_SIZE = 70; // pixels (diameter)
+        const MAX_SIZE = 120; // pixels (diameter)
+        const MIN_DURATION = 15; // seconds (longer duration for slow drift)
+        const MAX_DURATION = 25; // seconds
+
+        /**
+         * Creates and animates a single soap bubble.
+         */
+        function createBubble() {
+            const bubble = document.createElement('div');
+            bubble.classList.add('bubble');
+
+            // Randomize properties for each bubble
+            const size = Math.random() * (MAX_SIZE - MIN_SIZE) + MIN_SIZE;
+            const duration = Math.random() * (MAX_DURATION - MIN_DURATION) + MIN_DURATION;
+            // Negative delay to make bubbles appear at various stages of animation
+            const delay = Math.random() * duration;
+
+            // Randomize animation path coordinates using viewport units for responsiveness
+            // Bubbles typically start off-screen or near the top
+            const startX = `${-20 + Math.random() * 140}vw`; // From -20vw to 120vw
+            const startY = `${-20 + Math.random() * 20}vh`; // Start from top off-screen or near top
+
+            const point1X = `${Math.random() * 100}vw`;
+            const point1Y = `${Math.random() * 100}vh`;
+            const point2X = `${Math.random() * 100}vw`;
+            const point2Y = `${Math.random() * 100}vh`;
+            const point3X = `${Math.random() * 100}vw`;
+            const point3Y = `${Math.random() * 100}vh`;
+
+            // Bubbles typically end off-screen or near the bottom
+            const endX = `${-20 + Math.random() * 140}vw`;
+            const endY = `${80 + Math.random() * 40}vh`; // End near bottom or off-screen
+
+            bubble.style.width = `${size}px`;
+            bubble.style.height = `${size}px`;
+            bubble.style.setProperty('--duration', `${duration}s`);
+            bubble.style.setProperty('--start-x', startX);
+            bubble.style.setProperty('--start-y', startY);
+            bubble.style.setProperty('--point1-x', point1X);
+            bubble.style.setProperty('--point1-y', point1Y);
+            bubble.style.setProperty('--point2-x', point2X);
+            bubble.style.setProperty('--point2-y', point2Y);
+            bubble.style.setProperty('--point3-x', point3X);
+            bubble.style.setProperty('--point3-y', point3Y);
+            bubble.style.setProperty('--end-x', endX);
+            bubble.style.setProperty('--end-y', endY);
+            bubble.style.animationDelay = `-${delay}s`;
+
+            bubbleContainer.appendChild(bubble);
+
+            // When an animation iteration ends (i.e., the bubble finishes its loop and "pops"),
+            // remove it and create a new one to maintain the continuous flow.
+            bubble.addEventListener('animationiteration', () => {
+                bubble.remove(); // Remove the old bubble
+                createBubble(); // Create a new one with new random properties
+            });
+        }
+
+        /**
+         * Initializes the animation by creating the initial set of soap bubbles.
+         */
+        function initBubbleDrift() {
+            for (let i = 0; i < NUM_BUBBLES; i++) {
+                createBubble();
+            }
+        }
+
+        // Start the bubble drift animation when the window has fully loaded
+        window.onload = initBubbleDrift;
+    </script>
+</body>
+</html>

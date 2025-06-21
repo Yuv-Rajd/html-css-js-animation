@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fluid Color Animation</title>
+    <!--
+        This CSS provides the overall styling for the page and the SVG container.
+        - The body and html are set to take up the full viewport, ensuring a consistent
+          black background.
+        - overflow: hidden prevents any scrollbars, which is important for a full-screen animation.
+        - The .svg-container class styles the main area where the animation takes place.
+          It uses responsive widths, maintains an aspect ratio, and adds a subtle glow effect
+          with rounded corners.
+        - The svg element inside the container is styled to fill its parent.
+    -->
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden; /* Hide scrollbars */
+            background-color: black; /* Essential black background as requested */
+            font-family: 'Inter', sans-serif; /* A clean, modern font */
+            display: flex; /* Use flexbox to center the SVG container */
+            justify-content: center;
+            align-items: center;
+        }
+
+        .svg-container {
+            /* Adjusted width for better mobile viewing, now taking 98% of available width */
+            width: 98%;
+            max-width: 1200px; /* Limit maximum width for large screens */
+            aspect-ratio: 16 / 9; /* Maintain a 16:9 aspect ratio for video-like feel */
+            background-color: #000; /* Explicitly black background for the SVG area */
+            border-radius: 20px; /* Nicely rounded corners for the container */
+            /* Advanced styling: Multiple box-shadows create a vibrant, soft glow */
+            box-shadow:
+                0 0 40px rgba(255, 0, 255, 0.4), /* Magenta glow */
+                0 0 80px rgba(0, 255, 255, 0.3), /* Cyan glow */
+                0 0 120px rgba(255, 255, 0, 0.2); /* Yellow glow */
+            overflow: hidden; /* Crucial to clip particles that move beyond the container edges */
+            position: relative; /* For potential future absolute positioning of elements */
+        }
+
+        svg {
+            display: block; /* Remove any default inline-block spacing issues */
+            width: 100%; /* Make the SVG fill the container */
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <!--
+        The main container for the SVG animation.
+        This div helps in centering and applying responsive styling to the SVG.
+    -->
+    <div class="svg-container">
+        <!--
+            The SVG element where the animation will be drawn.
+            - id="inkAnimation" allows easy access from JavaScript.
+            - viewBox defines the internal coordinate system (1000x562.5 is 16:9 aspect).
+            - preserveAspectRatio="xMidYMid meet" ensures the SVG scales nicely within its container.
+        -->
+        <svg id="inkAnimation" viewBox="0 0 1000 562.5" preserveAspectRatio="xMidYMid meet"></svg>
+    </div>
+
+    <script>
+        // Get the SVG element by its ID
+        const svg = document.getElementById('inkAnimation');
+        // Define the internal SVG dimensions based on the viewBox for calculations
+        const svgWidth = 1000;
+        const svgHeight = 562.5;
+
+        // Array to hold all active particle objects
+        const particles = [];
+        // Maximum number of particles to manage for performance and visual density
+        const maxParticles = 150;
+        // Array of vibrant, ink-like colors to be used for particles
+        const colors = [
+            '#FF00FF', // Magenta
+            '#00FFFF', // Cyan
+            '#FFFF00', // Yellow
+            '#FF69B4', // Hot Pink
+            '#00BFFF', // Deep Sky Blue
+            '#FFD700', // Gold
+            '#9932CC'  // Dark Orchid
+        ];
+
+        let animationStartTime; // Timestamp when the current 30-second loop started
+        const animationDuration = 30 * 1000; // 30 seconds in milliseconds
+
+        /**
+         * Creates a new particle (SVG circle element) and adds it to the SVG and particles array.
+         * @param {number} x - Initial X coordinate of the particle.
+         * @param {number} y - Initial Y coordinate of the particle.
+         * @param {string} color - Hex color string for the particle.
+         */
+        function createParticle(x, y, color) {
+            // Create a new circle element within the SVG namespace
+            const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            // Randomize radius between 5 and 25
+            const radius = Math.random() * 20 + 5;
+            // Randomize initial opacity between 0.1 and 0.5 for semi-transparent look
+            const opacity = 0.1 + Math.random() * 0.4;
+            // Random initial direction for movement
+            const angle = Math.random() * Math.PI * 2;
+            // Random initial speed between 0.5 and 1.5
+            const speed = Math.random() * 1 + 0.5;
+
+            // Set initial SVG attributes for the circle
+            circle.setAttribute('cx', x);
+            circle.setAttribute('cy', y);
+            circle.setAttribute('r', radius);
+            circle.setAttribute('fill', color);
+            circle.setAttribute('opacity', opacity);
+
+            // Add the new circle to the SVG
+            svg.appendChild(circle);
+
+            // Store particle properties in an object for easy updates in the animation loop
+            particles.push({
+                element: circle, // Reference to the SVG element
+                x: x,
+                y: y,
+                r: radius,
+                fill: color,
+                opacity: opacity,
+                vx: Math.cos(angle) * speed, // Velocity in X direction
+                vy: Math.sin(angle) * speed, // Velocity in Y direction
+                life: 0, // Current life (frames)
+                maxLife: 300 + Math.random() * 200, // Max life before fading out completely
+                // Random phase for sine wave radius fluctuation
+                radiusPhase: Math.random() * Math.PI * 2
+            });
+        }
+
+        /**
+         * Initializes or resets the animation state.
+         * Clears all existing particles and creates an initial burst for the "ink drop" effect.
+         */
+        function initAnimation() {
+            // Remove all child elements (particles) from the SVG
+            while (svg.firstChild) {
+                svg.removeChild(svg.firstChild);
+            }
+            // Clear the particles array
+            particles.length = 0;
+
+            // Record the start time of this new animation cycle
+            animationStartTime = performance.now();
+
+            // Create an initial burst of particles near the center to simulate an "ink drop"
+            const centerX = svgWidth / 2;
+            const centerY = svgHeight / 2;
+            for (let i = 0; i < 30; i++) { // Create 30 initial particles
+                const initialColor = colors[Math.floor(Math.random() * colors.length)];
+                // Spawn particles slightly off-center for a more organic cluster
+                createParticle(centerX + (Math.random() - 0.5) * 80, centerY + (Math.random() - 0.5) * 80, initialColor);
+            }
+        }
+
+        /**
+         * The main animation loop, called repeatedly by requestAnimationFrame.
+         * Updates particle positions, opacities, handles boundaries, and manages spawning/removal.
+         * @param {DOMHighResTimeStamp} currentTime - The timestamp provided by requestAnimationFrame.
+         */
+        function animate(currentTime) {
+            // Initialize animationStartTime if it's the first frame
+            if (!animationStartTime) {
+                animationStartTime = currentTime;
+            }
+
+            const elapsedTime = currentTime - animationStartTime;
+
+            // Periodically spawn new particles to maintain visual density
+            // This is a probabilistic check to add new particles over time
+            if (particles.length < maxParticles && Math.random() < 0.15) { // 15% chance each frame
+                const x = Math.random() * svgWidth;
+                const y = Math.random() * svgHeight;
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                createParticle(x, y, color);
+            }
+
+            // Iterate through particles in reverse to safely remove elements during iteration
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+
+                // Update position based on velocity
+                p.x += p.vx;
+                p.y += p.vy;
+
+                // Add slight random perturbation to velocity for more organic, fluid motion
+                p.vx += (Math.random() - 0.5) * 0.1; // Small random push in X
+                p.vy += (Math.random() - 0.5) * 0.1; // Small random push in Y
+
+                // Keep velocity within reasonable bounds to prevent particles from flying off too fast
+                const maxSpeed = 3;
+                const currentSpeed = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
+                if (currentSpeed > maxSpeed) {
+                    // Normalize velocity and scale to maxSpeed
+                    p.vx = (p.vx / currentSpeed) * maxSpeed;
+                    p.vy = (p.vy / currentSpeed) * maxSpeed;
+                }
+
+                // Bounce off SVG edges
+                // If particle goes beyond right or left edge
+                if (p.x + p.r > svgWidth || p.x - p.r < 0) {
+                    p.vx *= -1; // Reverse X velocity
+                    // Clamp position to ensure it's inside the bounds, preventing sticking
+                    p.x = Math.max(p.r, Math.min(svgWidth - p.r, p.x));
+                }
+                // If particle goes beyond top or bottom edge
+                if (p.y + p.r > svgHeight || p.y - p.r < 0) {
+                    p.vy *= -1; // Reverse Y velocity
+                    // Clamp position to ensure it's inside the bounds
+                    p.y = Math.max(p.r, Math.min(svgHeight - p.r, p.y));
+                }
+
+                // Increment particle's lifetime
+                p.life++;
+                // Gradually fade out the particle to simulate dissolving ink
+                p.opacity = Math.max(0, p.opacity - 0.0015); // Adjust fade rate here
+
+                // Remove particle if it's too transparent or has lived its max life
+                if (p.opacity <= 0.01 || p.life > p.maxLife) {
+                    svg.removeChild(p.element); // Remove SVG element from the DOM
+                    particles.splice(i, 1); // Remove from the particles array
+                } else {
+                    // Update SVG element attributes to reflect new state
+                    p.element.setAttribute('cx', p.x);
+                    p.element.setAttribute('cy', p.y);
+                    // Make radius fluctuate slightly for a more organic, pulsing look
+                    p.element.setAttribute('r', p.r + Math.sin(p.life * 0.05 + p.radiusPhase) * 3);
+                    p.element.setAttribute('opacity', p.opacity);
+                }
+            }
+
+            // Check if the 30-second animation duration has passed
+            if (elapsedTime >= animationDuration) {
+                initAnimation(); // Restart the entire animation sequence
+            }
+
+            // Request the next animation frame
+            requestAnimationFrame(animate);
+        }
+
+        // Initialize and start the animation when the window has fully loaded
+        window.onload = function() {
+            initAnimation(); // Perform initial setup
+            requestAnimationFrame(animate); // Start the animation loop
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zero-Gravity Slicing</title>
+    <!--
+        This CSS creates a full-screen, ASMR-inspired animation of objects
+        sliced in zero-gravity. Pieces float, rotate, and reassemble seamlessly.
+        It uses nested div elements for objects and slices, CSS transforms for
+        motion and rotation, radial gradients for vibrancy, and staggered
+        animations for a hypnotic, continuous loop.
+    -->
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden; /* Prevent scrollbars for a clean full-screen experience */
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* Cosmic background: starry black with a subtle radial gradient */
+            background: radial-gradient(circle at center, #10002b 0%, #000000 70%);
+        }
+
+        /*
+            Main container for the zero-gravity scene.
+            It covers the entire screen and provides the context for the floating objects.
+        */
+        .zero-gravity-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden; /* Ensure objects are clipped if they go out of bounds */
+        }
+
+        /*
+            Base styling for an individual fruit/object.
+            This acts as a wrapper for its slices, allowing them to be grouped and moved.
+        */
+        .fruit-object {
+            position: absolute;
+            width: 150px; /* Base size of the full object */
+            height: 150px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transform-style: preserve-3d; /* Allows for 3D rotation of slices */
+            will-change: transform;
+            opacity: 0; /* Hidden by default, will fade in as part of animation setup */
+        }
+
+        /*
+            Styling for an individual slice of the fruit/object.
+            Each slice is a semi-circular div that forms part of the whole object.
+        */
+        .fruit-slice {
+            position: absolute;
+            width: 100%; /* Take full width of parent fruit-object */
+            height: 50%; /* Half height for a top/bottom slice */
+            border-radius: 75px 75px 0 0; /* Top half of a circle */
+            transform-origin: bottom center; /* Pivot from the bottom for rotation */
+            will-change: transform, opacity;
+
+            /* Base radial gradient for vibrant, juicy colors with depth */
+            background: radial-gradient(circle at 50% 10%, #ffffff 0%, var(--fruit-color) 70%, rgba(var(--fruit-color-rgb), 0.7) 100%);
+            box-shadow: 0 0 15px rgba(var(--fruit-color-rgb), 0.5); /* Subtle glow */
+        }
+
+        /* Adjustments for the bottom slice */
+        .fruit-slice.bottom {
+            top: 50%; /* Position it below the top slice */
+            border-radius: 0 0 75px 75px; /* Bottom half of a circle */
+            transform-origin: top center; /* Pivot from the top for rotation */
+            transform: rotateX(180deg); /* Flip to face correctly */
+        }
+
+        /* Define specific vibrant colors for each fruit object */
+        .fruit-object.orange {
+            --fruit-color: #FFA500; /* Neon Orange */
+            --fruit-color-rgb: 255, 165, 0;
+            left: 20%; top: 30%; /* Initial position */
+            animation: sliceAndReassemble 6s ease-in-out infinite, rotateObject 12s linear infinite;
+        }
+
+        .fruit-object.lime {
+            --fruit-color: #32CD32; /* Lime Green */
+            --fruit-color-rgb: 50, 205, 50;
+            width: 130px; height: 130px; /* Slightly different size */
+            left: 50%; top: 60%;
+            animation: sliceAndReassemble 7s ease-in-out infinite alternate, rotateObject 15s linear infinite reverse;
+        }
+
+        .fruit-object.berry {
+            --fruit-color: #DB7093; /* PaleVioletRed (berry pink) */
+            --fruit-color-rgb: 219, 112, 147;
+            width: 170px; height: 170px; /* Larger size */
+            left: 75%; top: 20%;
+            animation: sliceAndReassemble 8s ease-in-out infinite, rotateObject 10s linear infinite;
+        }
+
+        /*
+            Keyframe animation for the slicing and reassembly of the fruit object.
+            This animation is applied to the individual slices, with relative transforms.
+        */
+        @keyframes sliceAndReassemble {
+            /* Phase 1: Assembled */
+            0% { transform: translateY(0) rotateX(0deg); opacity: 1; }
+            10% { opacity: 1; } /* Fully visible */
+
+            /* Phase 2: Sliced - segments separate and float */
+            25% {
+                /* Top slice moves up and spins */
+                .fruit-object.orange & { transform: translateY(-70px) rotateX(-45deg); }
+                .fruit-object.lime & { transform: translateY(-60px) rotateX(-50deg); }
+                .fruit-object.berry & { transform: translateY(-80px) rotateX(-40deg); }
+                opacity: 1;
+            }
+            50% {
+                /* Bottom slice moves down and spins */
+                .fruit-object.orange .bottom & { transform: translateY(70px) rotateX(225deg); } /* 180 + 45 */
+                .fruit-object.lime .bottom & { transform: translateY(60px) rotateX(230deg); }
+                .fruit-object.berry .bottom & { transform: translateY(80px) rotateX(220deg); }
+                opacity: 1;
+            }
+
+            /* Phase 3: Reassembling - segments move back together */
+            75% {
+                /* Slices move towards center */
+                .fruit-object.orange & { transform: translateY(-10px) rotateX(-10deg); }
+                .fruit-object.lime & { transform: translateY(-8px) rotateX(-12deg); }
+                .fruit-object.berry & { transform: translateY(-12px) rotateX(-8deg); }
+                opacity: 1;
+            }
+
+            /* Phase 4: Fully Reassembled and fades out slightly for loop */
+            90% { opacity: 1; }
+            100% { transform: translateY(0) rotateX(0deg); opacity: 0; } /* Ready for new cycle */
+        }
+
+        /* This keyframe animates the parent fruit-object itself for overall movement */
+        @keyframes rotateObject {
+            0% { transform: translate(-50%, -50%) rotateY(0deg) rotateX(0deg); opacity: 0;}
+            10% { opacity: 1; }
+            50% { transform: translate(-50%, -50%) rotateY(360deg) rotateX(180deg); }
+            90% { opacity: 1; }
+            100% { transform: translate(-50%, -50%) rotateY(720deg) rotateX(360deg); opacity: 0;}
+        }
+
+
+        /* Responsive adjustments for smaller screens */
+        @media (max-width: 768px) {
+            .fruit-object {
+                width: 100px;
+                height: 100px;
+            }
+            .fruit-slice {
+                border-radius: 50px 50px 0 0;
+            }
+            .fruit-slice.bottom {
+                border-radius: 0 0 50px 50px;
+            }
+
+            /* Adjust slice movement for smaller sizes */
+            @keyframes sliceAndReassemble {
+                0% { transform: translateY(0) rotateX(0deg); opacity: 1; }
+                10% { opacity: 1; }
+                25% {
+                    .fruit-object.orange & { transform: translateY(-40px) rotateX(-30deg); }
+                    .fruit-object.lime & { transform: translateY(-35px) rotateX(-35deg); }
+                    .fruit-object.berry & { transform: translateY(-45px) rotateX(-28deg); }
+                    opacity: 1;
+                }
+                50% {
+                    .fruit-object.orange .bottom & { transform: translateY(40px) rotateX(210deg); } /* 180 + 30 */
+                    .fruit-object.lime .bottom & { transform: translateY(35px) rotateX(215deg); }
+                    .fruit-object.berry .bottom & { transform: translateY(45px) rotateX(208deg); }
+                    opacity: 1;
+                }
+                75% {
+                    .fruit-object.orange & { transform: translateY(-5px) rotateX(-5deg); }
+                    .fruit-object.lime & { transform: translateY(-4px) rotateX(-6deg); }
+                    .fruit-object.berry & { transform: translateY(-6px) rotateX(-4deg); }
+                    opacity: 1;
+                }
+                90% { opacity: 1; }
+                100% { transform: translateY(0) rotateX(0deg); opacity: 0; }
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="zero-gravity-container">
+        <!-- Orange Object -->
+        <div class="fruit-object orange">
+            <div class="fruit-slice top"></div>
+            <div class="fruit-slice bottom"></div>
+        </div>
+
+        <!-- Lime Object -->
+        <div class="fruit-object lime">
+            <div class="fruit-slice top"></div>
+            <div class="fruit-slice bottom"></div>
+        </div>
+
+        <!-- Berry Object -->
+        <div class="fruit-object berry">
+            <div class="fruit-slice top"></div>
+            <div class="fruit-slice bottom"></div>
+        </div>
+    </div>
+</body>
+</html>

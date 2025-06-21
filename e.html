@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kaleidoscope Spiral</title>
+    <!--
+        This CSS creates a full-screen, ASMR-inspired animation featuring a
+        rotating kaleidoscope spiral. It uses nested divs, conic gradients,
+        CSS transforms for rotation and scaling, and blur filters for softness.
+    -->
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden; /* Prevent scrollbars for a clean full-screen experience */
+            background-color: #000000; /* Solid black background for vibrant color contrast */
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            perspective: 1000px; /* For potential 3D effects, though not heavily used here */
+        }
+
+        /*
+            Main container for the kaleidoscope effect.
+            It's centered on the screen and acts as the anchor for the rotating elements.
+        */
+        .kaleidoscope-container {
+            position: relative;
+            width: 80vmin; /* Responsive size based on viewport smaller dimension */
+            height: 80vmin;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%; /* Make the main shape circular */
+            /* Subtle shadow to give it depth, blending with the black background */
+            box-shadow: 0 0 100px rgba(0, 0, 0, 0.5) inset;
+        }
+
+        /*
+            Individual spiral layer. Multiple instances of this class
+            will be nested and rotated to create the spiral effect.
+        */
+        .spiral-layer {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%; /* Keep shapes circular */
+            opacity: 0.9; /* Slight transparency for layering and blending */
+            will-change: transform, filter; /* Optimize for animation performance */
+            /*
+                mix-blend-mode: screen is used to create luminous overlapping effects,
+                where colors combine to create brighter, new hues on a dark background.
+            */
+            mix-blend-mode: screen;
+            /* Apply a significant blur for soft edges and dreamy appearance */
+            filter: blur(25px); /* Soften the edges of each layer */
+            transform-origin: center center; /* Ensure rotation is around the center */
+        }
+
+        /*
+            Specific styling for each layer, including conic gradients and animation.
+            The conic-gradient creates radial color patterns within each layer.
+        */
+        .spiral-layer:nth-child(1) {
+            background: conic-gradient(
+                from 0deg,
+                #6a0dad 0%,      /* Dark Purple */
+                #8a2be2 25%,     /* Blue Violet */
+                #008080 50%,     /* Teal */
+                #20b2aa 75%,     /* Light Sea Green */
+                #1e90ff 100%     /* Dodger Blue */
+            );
+            /* Slower rotation */
+            animation: rotateKaleidoscope 40s linear infinite, scalePulse 15s ease-in-out infinite alternate;
+        }
+
+        .spiral-layer:nth-child(2) {
+            background: conic-gradient(
+                from 90deg, /* Offset start angle */
+                #1e90ff 0%,
+                #20b2aa 25%,
+                #008080 50%,
+                #8a2be2 75%,
+                #6a0dad 100%
+            );
+            transform: scale(0.9); /* Smaller layer */
+            opacity: 0.8;
+            filter: blur(20px);
+            /* Moderate rotation */
+            animation: rotateKaleidoscope 35s linear infinite reverse, scalePulse 12s ease-in-out infinite alternate-reverse;
+        }
+
+        .spiral-layer:nth-child(3) {
+            background: conic-gradient(
+                from 180deg, /* Further offset start angle */
+                #f000ff 0%,      /* Brighter Magenta */
+                #00ff00 25%,     /* Green */
+                #0000ff 50%,     /* Blue */
+                #ff0000 75%,     /* Red */
+                #ffff00 100%     /* Yellow */
+            );
+            transform: scale(0.8); /* Even smaller layer */
+            opacity: 0.7;
+            filter: blur(15px);
+            /* Faster rotation */
+            animation: rotateKaleidoscope 30s linear infinite, scalePulse 18s ease-in-out infinite alternate;
+        }
+
+        .spiral-layer:nth-child(4) {
+            background: conic-gradient(
+                from 270deg, /* Even further offset start angle */
+                #ffff00 0%,
+                #ff0000 25%,
+                #0000ff 50%,
+                #00ff00 75%,
+                #f000ff 100%
+            );
+            transform: scale(0.7); /* Smallest layer */
+            opacity: 0.6;
+            filter: blur(10px);
+            /* Fastest rotation */
+            animation: rotateKaleidoscope 25s linear infinite reverse, scalePulse 10s ease-in-out infinite alternate-reverse;
+        }
+
+
+        /* Keyframe animation for continuous rotation */
+        @keyframes rotateKaleidoscope {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Keyframe animation for subtle expanding and contracting effect */
+        @keyframes scalePulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); } /* Slightly larger */
+            100% { transform: scale(1); }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .kaleidoscope-container {
+                width: 95vmin;
+                height: 95vmin;
+            }
+            .spiral-layer {
+                filter: blur(15px); /* Less blur for mobile performance */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="kaleidoscope-container">
+        <!-- Multiple layers to create the complex spiral effect -->
+        <div class="spiral-layer"></div>
+        <div class="spiral-layer"></div>
+        <div class="spiral-layer"></div>
+        <div class="spiral-layer"></div>
+    </div>
+</body>
+</html>

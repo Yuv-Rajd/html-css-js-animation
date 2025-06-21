@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Floating Thread Weave</title>
+    <!--
+        This CSS creates a full-screen, ASMR-inspired animation of multiple
+        delicate threads weaving and floating. It uses div elements for threads,
+        CSS transforms with complex bezier-curve paths for organic motion,
+        staggered delays for the weaving effect, and subtle shadows/opacity for depth.
+    -->
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden; /* Prevent scrollbars */
+            background-color: #0c0c1a; /* Very dark background for contrast and depth */
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /*
+            Container for all the threads.
+            It spans the entire screen and clips threads that move outside.
+        */
+        .thread-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            /* Enhance overall visual blend with a saturation filter */
+            filter: saturate(1.1);
+        }
+
+        /*
+            Styling for an individual thread element.
+            These are tall, thin divs with rounded ends, made semi-transparent.
+            mix-blend-mode is crucial for the overlapping and blending effect.
+        */
+        .thread {
+            position: absolute;
+            width: 8px; /* Thickness of the thread */
+            height: 120vh; /* Make it span more than the screen height for seamless looping */
+            border-radius: 4px; /* Half of width for rounded ends */
+            opacity: 0.7; /* Semi-transparent for blending */
+            will-change: transform, opacity; /* Optimize for animation performance */
+            transform-origin: center center; /* Ensure transformations are from the center */
+            /*
+                mix-blend-mode: screen creates a luminous effect when colors overlap,
+                making them appear to "mix" and brighten on a dark background.
+            */
+            mix-blend-mode: screen;
+            filter: blur(1px) drop-shadow(0 0 5px rgba(0,0,0,0.5)); /* Subtle blur and shadow for depth */
+
+            /* Default animation, overridden for each thread */
+            animation: floatWeave 25s ease-in-out infinite alternate;
+        }
+
+        /* Define specific pastel colors for the threads */
+        .thread:nth-child(1) { background-color: #b19cd9; /* Lavender */ }
+        .thread:nth-child(2) { background-color: #a7e9af; /* Mint */ }
+        .thread:nth-child(3) { background-color: #f7a8b8; /* Blush Pink */ }
+        .thread:nth-child(4) { background-color: #87ceeb; /* Sky Blue */ }
+        .thread:nth-child(5) { background-color: #ffb6c1; /* Light Pink */ }
+        .thread:nth-child(6) { background-color: #c3f2d0; /* Pale Green */ }
+        .thread:nth-child(7) { background-color: #e0bbe4; /* Lilac */ }
+        .thread:nth-child(8) { background-color: #f0e68c; /* Khaki (soft yellow) */ }
+
+
+        /*
+            Keyframe animation for the floating and weaving motion.
+            Uses multiple transform properties with complex cubic-bezier curves
+            to create organic, non-linear, flowing paths.
+        */
+        @keyframes floatWeave {
+            0% {
+                transform: translate(-50vw, -100px) rotate(15deg) scaleY(0.8);
+                opacity: 0.5;
+            }
+            25% {
+                transform: translate(0vw, 200px) rotate(-5deg) scaleY(1);
+                opacity: 0.9;
+            }
+            50% {
+                transform: translate(50vw, 100px) rotate(10deg) scaleY(0.9);
+                opacity: 0.8;
+            }
+            75% {
+                transform: translate(0vw, -50px) rotate(-10deg) scaleY(1.1);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(-50vw, -100px) rotate(15deg) scaleY(0.8);
+                opacity: 0.5;
+            }
+        }
+
+        /*
+            Specific animation properties for each thread to create the weaving/staggered effect.
+            Each thread has a unique starting position and animation delay, and some have reversed animations.
+        */
+        .thread:nth-child(1) { left: 10%; animation-delay: 0s; animation-duration: 25s; }
+        .thread:nth-child(2) { left: 25%; animation-delay: 3s; animation-duration: 28s; animation-direction: alternate-reverse; }
+        .thread:nth-child(3) { left: 40%; animation-delay: 6s; animation-duration: 22s; }
+        .thread:nth-child(4) { left: 55%; animation-delay: 9s; animation-duration: 27s; animation-direction: alternate-reverse; }
+        .thread:nth-child(5) { left: 70%; animation-delay: 12s; animation-duration: 23s; }
+        .thread:nth-child(6) { left: 85%; animation-delay: 15s; animation-duration: 26s; animation-direction: alternate-reverse; }
+        .thread:nth-child(7) { left: 5%; animation-delay: 1s; animation-duration: 24s; }
+        .thread:nth-child(8) { left: 90%; animation-delay: 4s; animation-duration: 29s; animation-direction: alternate-reverse; }
+
+        /* Responsive adjustments for smaller screens */
+        @media (max-width: 768px) {
+            .thread {
+                width: 6px; /* Thinner threads on mobile */
+                border-radius: 3px;
+                filter: blur(0.5px) drop-shadow(0 0 3px rgba(0,0,0,0.4)); /* Less blur for mobile */
+            }
+            /* Adjust translate values for mobile if needed, to keep movement within viewport */
+            @keyframes floatWeave {
+                0% { transform: translate(-70vw, -80px) rotate(10deg) scaleY(0.8); }
+                25% { transform: translate(0vw, 150px) rotate(-5deg) scaleY(1); }
+                50% { transform: translate(70vw, 80px) rotate(8deg) scaleY(0.9); }
+                75% { transform: translate(0vw, -40px) rotate(-8deg) scaleY(1.1); }
+                100% { transform: translate(-70vw, -80px) rotate(10deg) scaleY(0.8); }
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="thread-container">
+        <!-- Create multiple thread elements -->
+        <div class="thread"></div>
+        <div class="thread"></div>
+        <div class="thread"></div>
+        <div class="thread"></div>
+        <div class="thread"></div>
+        <div class="thread"></div>
+        <div class="thread"></div>
+        <div class="thread"></div>
+    </div>
+</body>
+</html>

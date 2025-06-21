@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Magnetic Ball Dance</title>
+    <!--
+        This CSS creates a full-screen, ASMR-inspired animation featuring
+        multiple metallic balls that orbit and repel each other, mimicking
+        magnetic forces. It uses CSS transforms for complex elliptical paths,
+        radial gradients for metallic appearance, and staggered animations
+        for dynamic, continuous motion.
+    -->
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden; /* Prevent scrollbars for a clean full-screen experience */
+            background-color: #0c0c1a; /* Deep navy/charcoal background */
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /*
+            The main container for all the magnetic balls.
+            It acts as the central stage for their orbiting and repelling dance.
+        */
+        .magnet-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden; /* Ensure balls are clipped if they go out of bounds */
+            /* A subtle radial gradient on the background for depth */
+            background: radial-gradient(circle at center, #1a1a2e 0%, #0c0c1a 70%);
+        }
+
+        /*
+            Styling for an individual metallic ball.
+            Each ball is a circular div with a radial gradient for a shimmering, reflective look.
+        */
+        .magnetic-ball {
+            position: absolute;
+            width: 60px; /* Default size of the ball */
+            height: 60px;
+            border-radius: 50%; /* Makes the div perfectly circular */
+            will-change: transform; /* Optimize for animation performance */
+            /*
+                Complex radial gradient for a shimmering, reflective metallic look.
+                Uses multiple stops to create highlights and shadows.
+            */
+            background: radial-gradient(circle at 20% 20%, #ffffff 0%,
+                                        #e0e0e0 15%, #b0b0b0 35%,
+                                        var(--ball-color) 60%, #404040 100%);
+            /* Subtle box-shadow for a soft glow and ground shadow effect */
+            box-shadow: 0 0 15px rgba(var(--shadow-color-rgb), 0.5), /* Outer glow */
+                        inset 0 0 10px rgba(255, 255, 255, 0.4); /* Inner shine */
+            filter: blur(0.5px); /* Very slight blur for softer reflections */
+
+            /* Default animation properties, overridden via specific classes/inline styles */
+            animation: orbitDance 20s ease-in-out infinite;
+
+            /* Start all balls centered, then their animations will move them */
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%); /* Centers the ball itself */
+        }
+
+        /* Define specific colors and shadow colors for each ball using CSS custom properties */
+        .magnetic-ball:nth-child(1) {
+            --ball-color: #b0c4de; /* LightSteelBlue for silver */
+            --shadow-color-rgb: 176, 196, 222;
+            width: 70px; height: 70px;
+            animation: orbitDance 20s ease-in-out infinite alternate, repelPulse 3s ease-in-out infinite;
+        }
+        .magnetic-ball:nth-child(2) {
+            --ball-color: #daa520; /* Goldenrod for gold */
+            --shadow-color-rgb: 218, 165, 32;
+            width: 65px; height: 65px;
+            animation: orbitDance 22s ease-in-out infinite alternate-reverse, repelPulse 3.5s ease-in-out infinite reverse;
+        }
+        .magnetic-ball:nth-child(3) {
+            --ball-color: #4682b4; /* SteelBlue for iridescent blue */
+            --shadow-color-rgb: 70, 130, 180;
+            width: 75px; height: 75px;
+            animation: orbitDance 18s ease-in-out infinite, repelPulse 2.8s ease-in-out infinite;
+        }
+        .magnetic-ball:nth-child(4) {
+            --ball-color: #8a2be2; /* BlueViolet for another iridescent */
+            --shadow-color-rgb: 138, 43, 226;
+            width: 60px; height: 60px;
+            animation: orbitDance 25s ease-in-out infinite reverse, repelPulse 4s ease-in-out infinite reverse;
+        }
+
+
+        /*
+            Keyframe animation for the complex orbiting and repelling motion.
+            Uses a series of transform: translate values to create an elliptical/curvy path.
+            The animation includes phases of closer approach and repulsion.
+            Now uses viewport units (vw, vh) for responsive scaling.
+        */
+        @keyframes orbitDance {
+            0% { transform: translate(-50%, -50%) translateX(-15vw) translateY(0vh); }
+            20% { transform: translate(-50%, -50%) translateX(10vw) translateY(-12vh); }
+            40% { transform: translate(-50%, -50%) translateX(18vw) translateY(5vh); }
+            60% { transform: translate(-50%, -50%) translateX(0vw) translateY(15vh); }
+            80% { transform: translate(-50%, -50%) translateX(-12vw) translateY(-8vh); }
+            100% { transform: translate(-50%, -50%) translateX(-15vw) translateY(0vh); }
+        }
+
+        /*
+            Keyframe animation for the subtle "repel" pulse when balls might draw near.
+            This is applied as an additional animation to create a gentle bounce.
+        */
+        @keyframes repelPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(0.98); } /* Slightly contracts as if repelling/bouncing */
+        }
+
+        /* Responsive adjustments for smaller screens (e.g., mobile devices) */
+        @media (max-width: 768px) {
+            .magnetic-ball {
+                width: 40px; /* Smaller balls on mobile */
+                height: 40px;
+                box-shadow: 0 0 10px rgba(var(--shadow-color-rgb), 0.4),
+                            inset 0 0 8px rgba(255, 255, 255, 0.3);
+                filter: blur(0.3px);
+            }
+            /* Adjust orbit range for mobile to keep balls within view and maintain dynamic feel */
+            @keyframes orbitDance {
+                0% { transform: translate(-50%, -50%) translateX(-25vw) translateY(0vh); }
+                20% { transform: translate(-50%, -50%) translateX(15vw) translateY(-20vh); }
+                40% { transform: translate(-50%, -50%) translateX(30vw) translateY(8vh); }
+                60% { transform: translate(-50%, -50%) translateX(0vw) translateY(25vh); }
+                80% { transform: translate(-50%, -50%) translateX(-20vw) translateY(-15vh); }
+                100% { transform: translate(-50%, -50%) translateX(-25vw) translateY(0vh); }
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="magnet-container">
+        <!-- Multiple magnetic ball elements -->
+        <div class="magnetic-ball"></div>
+        <div class="magnetic-ball"></div>
+        <div class="magnetic-ball"></div>
+        <div class="magnetic-ball"></div>
+    </div>
+</body>
+</html>

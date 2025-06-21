@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thread Unraveling Loop</title>
+    <!--
+        This CSS creates a full-screen, ASMR-inspired animation of a thread
+        unraveling from and rewinding onto a central spool. It uses CSS transforms
+        for rotation and scaling, box-shadow for a subtle glow/fraying,
+        and a seamless, repetitive animation loop.
+    -->
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden; /* Prevent scrollbars for a clean full-screen experience */
+            background-color: #0d0d1a; /* Dark blue-purple background for contrast */
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /*
+            The main container for the animation elements.
+            It's centered on the screen and acts as the canvas for the spool and thread.
+        */
+        .animation-container {
+            position: relative;
+            width: 500px; /* Base size for the animation area */
+            height: 500px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* Ensures 3D transformations are rendered correctly */
+            transform-style: preserve-3d;
+        }
+
+        /*
+            The central spool element around which the thread unravels.
+            It's a simple circular div that rotates continuously.
+        */
+        .spool {
+            position: absolute;
+            width: 80px; /* Size of the spool */
+            height: 80px;
+            background-color: #444; /* Dark gray for the spool */
+            border-radius: 50%; /* Makes it circular */
+            z-index: 2; /* Ensures the spool appears above the thread */
+            /* Subtle inner and outer shadows for a realistic, textured look */
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5), 0 0 10px rgba(255,255,255,0.1);
+            /* Continuous rotation animation */
+            animation: spoolRotate 7s linear infinite;
+        }
+
+        /*
+            A wrapper for the thread to help manage its rotation and positioning
+            relative to the center of the animation container.
+        */
+        .thread-wrapper {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transform-origin: center center; /* Ensures the entire wrapper rotates from its center */
+        }
+
+        /*
+            The thread element itself. This is a thin rectangle that expands
+            and rotates to simulate unraveling and rewinding.
+        */
+        .thread {
+            position: absolute;
+            height: 8px; /* Thickness of the thread */
+            /* Gradient for a soft, vibrant color with depth (coral to light pink) */
+            background: linear-gradient(to right, #ff7f50, #ffc0cb, #ff7f50);
+            border-radius: 4px; /* Rounded edges for the thread */
+            /*
+                Crucial for the unraveling effect: the thread grows/rotates from its left end,
+                which is anchored to the spool's edge.
+            */
+            transform-origin: left center;
+            filter: blur(0.5px); /* Subtle blur for softness and a "velvety" feel */
+            /* Box-shadow to mimic subtle fraying and add a soft glow */
+            box-shadow: 0 0 5px rgba(255,127,80,0.6);
+            z-index: 1; /* Positioned below the spool */
+            /* The main animation for the thread's unraveling and swirling motion */
+            animation: unravelThread 7s ease-in-out infinite alternate;
+        }
+
+        /* Keyframe animation for the continuous rotation of the spool */
+        @keyframes spoolRotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /*
+            Keyframe animation for the thread's unraveling, swirling, and rewinding.
+            It combines changes in width (unraveling/rewinding) with rotation (swirling)
+            and translation to keep the origin anchored to the spool.
+        */
+        @keyframes unravelThread {
+            0% {
+                width: 0px; /* Thread is fully wound (start state) */
+                /* Translate to the edge of the spool's radius (40px) and start rotation */
+                transform: rotate(0deg) translateX(40px);
+                opacity: 0; /* Starts invisible */
+            }
+            10% {
+                opacity: 1; /* Fades in as it begins to unravel */
+            }
+            50% {
+                width: 250px; /* Thread unravels to its maximum length */
+                /* Rotates and maintains its attachment point to the spool */
+                transform: rotate(270deg) translateX(40px);
+                opacity: 1; /* Fully opaque during the unraveling phase */
+            }
+            90% {
+                opacity: 1; /* Stays opaque until near the end of rewinding */
+            }
+            100% {
+                width: 0px; /* Thread rewinds completely */
+                /* Continues rotation to ensure a seamless loop, ending where it started */
+                transform: rotate(540deg) translateX(40px);
+                opacity: 0; /* Fades out as it fully rewinds */
+            }
+        }
+
+        /* Responsive adjustments for smaller screens (e.g., mobile devices) */
+        @media (max-width: 768px) {
+            .animation-container {
+                width: 90vmin; /* Larger relative to viewport on mobile */
+                height: 90vmin;
+            }
+            .spool {
+                width: 60px; /* Smaller spool */
+                height: 60px;
+            }
+            .thread {
+                height: 6px; /* Thinner thread */
+                border-radius: 3px;
+                filter: blur(0.3px); /* Less blur for mobile performance */
+                box-shadow: 0 0 3px rgba(255,127,80,0.5); /* Adjusted shadow */
+            }
+            /* Adjust keyframe values for mobile to fit the smaller dimensions */
+            @keyframes unravelThread {
+                0% { width: 0px; transform: rotate(0deg) translateX(30px); opacity: 0; }
+                10% { opacity: 1; }
+                50% { width: 180px; transform: rotate(270deg) translateX(30px); opacity: 1; }
+                90% { opacity: 1; }
+                100% { width: 0px; transform: rotate(540deg) translateX(30px); opacity: 0; }
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="animation-container">
+        <!-- The central spool -->
+        <div class="spool"></div>
+        <!-- Wrapper for the thread to manage its central positioning and rotation -->
+        <div class="thread-wrapper">
+            <!-- The thread element itself -->
+            <div class="thread"></div>
+        </div>
+    </div>
+</body>
+</html>

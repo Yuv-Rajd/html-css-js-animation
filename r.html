@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cosmic Particle Swarm</title>
+    <!--
+        This CSS sets up a full-screen, ASMR-inspired animation of tiny, glowing
+        cosmic particles that swarm and form ethereal constellations.
+        It uses JavaScript to dynamically create and animate individual particles
+        with randomized paths, sizes, and delays, all within a seamless loop.
+    -->
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden; /* Prevent scrollbars for a clean full-screen experience */
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* Deep cosmic background: midnight blue/black with a faint radial gradient */
+            background: radial-gradient(circle at center, #10002b 0%, #000000 70%);
+        }
+
+        /*
+            Main container for all the cosmic particles.
+            It spans the entire screen and serves as the stage for the swarm.
+        */
+        .particle-swarm-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden; /* Ensure particles are clipped when out of bounds */
+        }
+
+        /*
+            Styling for an individual cosmic particle.
+            These are small, circular divs with a subtle glow effect.
+        */
+        .cosmic-particle {
+            position: absolute;
+            border-radius: 50%; /* Makes the div perfectly circular (dot-like) */
+            background-color: var(--particle-color); /* Color set by JS */
+            opacity: 0; /* Starts hidden, fades in */
+            will-change: transform, opacity, box-shadow; /* Optimize for animation performance */
+            pointer-events: none; /* Ensure particles don't interfere with interaction */
+
+            /* Default animation properties, duration and delay set by JavaScript */
+            animation: swarmMove var(--duration) ease-in-out infinite alternate;
+        }
+
+        /*
+            Keyframe animation for the particle swarm's movement.
+            It defines a complex, organic path using multiple translate points
+            to simulate clustering, dispersing, and reforming patterns.
+        */
+        @keyframes swarmMove {
+            0% {
+                transform: translate(var(--start-x), var(--start-y)) scale(0.5);
+                opacity: 0; /* Fade in from start */
+                box-shadow: 0 0 5px var(--particle-color-rgb-alpha);
+            }
+            10% {
+                opacity: 1; /* Fully visible */
+            }
+            25% {
+                transform: translate(var(--point1-x), var(--point1-y)) scale(1);
+                box-shadow: 0 0 15px var(--particle-color-rgb-alpha);
+            }
+            50% {
+                transform: translate(var(--point2-x), var(--point2-y)) scale(0.8);
+                box-shadow: 0 0 10px var(--particle-color-rgb-alpha);
+            }
+            75% {
+                transform: translate(var(--point3-x), var(--point3-y)) scale(1.1);
+                box-shadow: 0 0 20px var(--particle-color-rgb-alpha);
+            }
+            90% {
+                opacity: 1; /* Stay visible until near end */
+            }
+            100% {
+                transform: translate(var(--end-x), var(--end-y)) scale(0.5);
+                opacity: 0; /* Fade out at end */
+                box-shadow: 0 0 5px var(--particle-color-rgb-alpha);
+            }
+        }
+
+        /* Responsive adjustments for smaller screens (e.g., mobile devices) */
+        @media (max-width: 768px) {
+            .cosmic-particle {
+                filter: blur(0.2px); /* Slightly less blur on mobile */
+            }
+            /* Adjust particle size range if needed for mobile */
+            /* Ensure movement range (vw/vh) is still appropriate */
+        }
+    </style>
+</head>
+<body>
+    <div class="particle-swarm-container">
+        <!-- Cosmic particles will be dynamically added here by JavaScript -->
+    </div>
+
+    <script>
+        const particleSwarmContainer = document.querySelector('.particle-swarm-container');
+
+        // Soft, luminous colors for particles
+        const colors = [
+            '#FFFFFF',    // White
+            '#ADD8E6',    // Pale Blue (LightBlue)
+            '#E0BBE4',    // Lavender
+            '#FFC0CB',    // Pastel Pink (LightPink)
+            '#AFEEEE'     // Pale Turquoise
+        ];
+
+        // Corresponding RGB values for box-shadows (alpha will be added dynamically)
+        const colorsRGB = [
+            '255, 255, 255',
+            '173, 216, 230',
+            '224, 187, 228',
+            '255, 192, 203',
+            '175, 238, 238'
+        ];
+
+        const NUM_PARTICLES = 150; // Number of particles in the swarm
+        const MIN_SIZE = 2; // pixels
+        const MAX_SIZE = 5; // pixels
+        const MIN_DURATION = 6; // seconds
+        const MAX_DURATION = 8; // seconds
+
+        /**
+         * Creates and animates a single cosmic particle.
+         */
+        function createParticle() {
+            const particle = document.createElement('div');
+            particle.classList.add('cosmic-particle');
+
+            // Randomize properties for each particle
+            const size = Math.random() * (MAX_SIZE - MIN_SIZE) + MIN_SIZE;
+            const duration = Math.random() * (MAX_DURATION - MIN_DURATION) + MIN_DURATION;
+            // Negative delay to make particles appear at various stages of animation
+            const delay = Math.random() * duration;
+
+            const colorIndex = Math.floor(Math.random() * colors.length);
+            const color = colors[colorIndex];
+            const colorRGB = colorsRGB[colorIndex];
+
+            // Randomize animation path coordinates using viewport units for responsiveness
+            const startX = `${Math.random() * 100}vw`;
+            const startY = `${Math.random() * 100}vh`;
+            const point1X = `${Math.random() * 100}vw`;
+            const point1Y = `${Math.random() * 100}vh`;
+            const point2X = `${Math.random() * 100}vw`;
+            const point2Y = `${Math.random() * 100}vh`;
+            const point3X = `${Math.random() * 100}vw`;
+            const point3Y = `${Math.random() * 100}vh`;
+            const endX = `${Math.random() * 100}vw`;
+            const endY = `${Math.random() * 100}vh`;
+
+            particle.style.width = `${size}px`;
+            particle.style.height = `${size}px`;
+            particle.style.setProperty('--particle-color', color);
+            particle.style.setProperty('--particle-color-rgb-alpha', `rgba(${colorRGB}, var(--alpha, 0.7))`); /* Base alpha for shadow */
+            particle.style.setProperty('--duration', `${duration}s`);
+            particle.style.setProperty('--start-x', startX);
+            particle.style.setProperty('--start-y', startY);
+            particle.style.setProperty('--point1-x', point1X);
+            particle.style.setProperty('--point1-y', point1Y);
+            particle.style.setProperty('--point2-x', point2X);
+            particle.style.setProperty('--point2-y', point2Y);
+            particle.style.setProperty('--point3-x', point3X);
+            particle.style.setProperty('--point3-y', point3Y);
+            particle.style.setProperty('--end-x', endX);
+            particle.style.setProperty('--end-y', endY);
+            particle.style.animationDelay = `-${delay}s`;
+
+            particleSwarmContainer.appendChild(particle);
+
+            // When an animation iteration ends, remove and create a new one
+            // to ensure a continuous and seemingly infinite flow.
+            particle.addEventListener('animationiteration', () => {
+                // Remove the old particle
+                particle.remove();
+                // Create a new one with new random properties
+                createParticle();
+            });
+        }
+
+        /**
+         * Initializes the animation by creating the initial set of particles.
+         */
+        function initParticleSwarm() {
+            for (let i = 0; i < NUM_PARTICLES; i++) {
+                createParticle();
+            }
+        }
+
+        // Start the particle swarm animation when the window has fully loaded
+        window.onload = initParticleSwarm;
+    </script>
+</body>
+</html>

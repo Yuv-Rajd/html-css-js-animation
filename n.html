@@ -1,0 +1,180 @@
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Liquid Metal Flow</title>
+        <!--
+            This CSS creates a full-screen, ASMR-inspired animation of a fluid,
+            morphing liquid metal blob. It uses CSS clip-path for shape transformations,
+            linear gradients for metallic sheen and reflections, and filters for
+            a soft, glowing, and surreal aesthetic, all within a seamless loop.
+        -->
+        <style>
+            body, html {
+                margin: 0;
+                padding: 0;
+                width: 100%;
+                height: 100%;
+                overflow: hidden; /* Prevent scrollbars for a clean full-screen experience */
+                background-color: #0d0d0d; /* Deep charcoal/black minimalist background */
+                font-family: 'Inter', sans-serif;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+
+            /*
+                Main container for the liquid metal blob.
+                It acts as the stage for the animation, covering the entire screen.
+            */
+            .liquid-metal-container {
+                position: relative;
+                width: 100%;
+                height: 100%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                /* Optional: subtle background radial gradient for depth */
+                background: radial-gradient(circle at 50% 50%, #1a1a1a 0%, #0d0d0d 70%);
+            }
+
+            /*
+                The liquid metal blob element.
+                This div will be transformed using clip-path, gradients, and filters.
+            */
+            .liquid-metal-blob {
+                position: absolute;
+                width: 80vmin; /* Responsive size based on viewport smaller dimension */
+                height: 80vmin;
+                border-radius: 50%; /* Start as a circular blob base */
+                will-change: transform, clip-path, background, box-shadow; /* Optimize for animation */
+
+                /*
+                    Background gradient to simulate metallic reflections and iridescent highlights.
+                    Uses multiple stops for a shimmering, dynamic look.
+                */
+                background: linear-gradient(135deg,
+                    #e0e0e0 0%,     /* Silver highlight */
+                    #f5f5f5 20%,     /* Brighter silver */
+                    #c0c0c0 40%,     /* Mid-tone silver/chrome */
+                    #a0a0a0 60%,     /* Darker silver */
+                    #82b4dc 80%,     /* Subtle blue tint for iridescence */
+                    #add8e6 100%     /* Pale blue highlight */
+                );
+                background-size: 200% 200%; /* Larger background size for movement */
+
+                /* Filter for liquid, soft edges and a glowing aesthetic */
+                filter: blur(10px) contrast(1.5); /* Blur for softness, contrast to bring out gradients */
+                opacity: 0.95; /* Slight transparency for ethereal feel */
+
+                /* Box shadow for glowing edges and a sense of depth */
+                box-shadow: 0 0 40px rgba(173, 216, 230, 0.6), /* Pale blue glow */
+                            0 0 80px rgba(255, 255, 255, 0.2); /* White ambient glow */
+
+                /*
+                    Main animation for morphing, flowing, and reflecting.
+                    - 'metalFlow' handles shape changes and movement.
+                    - 'metalShine' animates the background position for dynamic reflections.
+                    - 'blobPulse' adds subtle scaling for organic feel.
+                */
+                animation:
+                    metalFlow 7s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate,
+                    metalShine 7s linear infinite,
+                    blobPulse 4s ease-in-out infinite alternate;
+            }
+
+            /*
+                Keyframe animation for the liquid metal flow (shape morphing and movement).
+                Uses clip-path: polygon() to create a series of distinct blob shapes that
+                transition smoothly into one another. Combined with transform for position.
+            */
+            @keyframes metalFlow {
+                0% {
+                    clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); /* Diamond */
+                    transform: translate(0, 0) scale(1);
+                }
+                20% {
+                    clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%); /* Octagon */
+                    transform: translate(5%, -5%) scale(0.98);
+                }
+                40% {
+                    clip-path: polygon(20% 0%, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 20% 100%, 0% 80%, 0% 20%); /* Smoother Octagon */
+                    transform: translate(-8%, 5%) scale(1.02);
+                }
+                60% {
+                    clip-path: polygon(15% 15%, 85% 15%, 85% 85%, 15% 85%); /* Square with rounded corners implicitly from border-radius */
+                    transform: translate(10%, 0%) scale(0.95);
+                }
+                80% {
+                    clip-path: polygon(0% 20%, 20% 0%, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 20% 100%, 0% 80%); /* Revert to Octagon-like */
+                    transform: translate(-5%, -10%) scale(1.03);
+                }
+                100% {
+                    clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); /* Back to Diamond */
+                    transform: translate(0, 0) scale(1);
+                }
+            }
+
+            /*
+                Keyframe animation for simulating dynamic reflections by shifting the background gradient.
+            */
+            @keyframes metalShine {
+                0% { background-position: 0% 50%; }
+                50% { background-position: 100% 50%; }
+                100% { background-position: 0% 50%; }
+            }
+
+            /*
+                Keyframe animation for subtle pulsing/breathing effect.
+            */
+            @keyframes blobPulse {
+                0%, 100% { transform: scale(1); }
+                50% { transform: scale(1.02); } /* Slightly larger */
+            }
+
+            /* Responsive adjustments for smaller screens (e.g., mobile devices) */
+            @media (max-width: 768px) {
+                .liquid-metal-blob {
+                    width: 90vmin; /* Make it larger on mobile to fill more space */
+                    height: 90vmin;
+                    filter: blur(8px) contrast(1.6); /* Slightly less blur, more contrast */
+                    box-shadow: 0 0 30px rgba(173, 216, 230, 0.5), /* Adjusted glow */
+                                0 0 60px rgba(255, 255, 255, 0.1);
+                }
+                /* Adjust translate values in metalFlow for mobile to prevent overflow */
+                @keyframes metalFlow {
+                    0% {
+                        clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+                        transform: translate(0, 0) scale(1);
+                    }
+                    20% {
+                        clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%);
+                        transform: translate(3%, -3%) scale(0.98); /* Smaller movements */
+                    }
+                    40% {
+                        clip-path: polygon(20% 0%, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 20% 100%, 0% 80%, 0% 20%);
+                        transform: translate(-5%, 3%) scale(1.02);
+                    }
+                    60% {
+                        clip-path: polygon(15% 15%, 85% 15%, 85% 85%, 15% 85%);
+                        transform: translate(6%, 0%) scale(0.95);
+                    }
+                    80% {
+                        clip-path: polygon(0% 20%, 20% 0%, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 20% 100%, 0% 80%);
+                        transform: translate(-3%, -6%) scale(1.03);
+                    }
+                    100% {
+                        clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+                        transform: translate(0, 0) scale(1);
+                    }
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="liquid-metal-container">
+            <div class="liquid-metal-blob"></div>
+        </div>
+    </body>
+    </html>

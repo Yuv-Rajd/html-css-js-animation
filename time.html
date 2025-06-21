@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Time in Vast Space</title>
+    <!--
+        This CSS creates a full-screen, ASMR-inspired animation depicting the
+        flow of time in space. It features a deep cosmic background, ethereal
+        nebulae, glowing particles, and a central abstract "time" element.
+        Utilizes CSS transforms, gradients, filters, and dynamic JavaScript
+        for particle generation and animation.
+    -->
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden; /* Prevent scrollbars for a clean full-screen experience */
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* Deep cosmic background: midnight blue to inky black with subtle stars */
+            background: radial-gradient(circle at center, #0a0a20 0%, #000000 80%),
+                        url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><circle cx="10" cy="10" r="1" fill="rgba(255,255,255,0.3)"/><circle cx="50" cy="50" r="0.5" fill="rgba(255,255,255,0.2)"/><circle cx="90" cy="20" r="0.8" fill="rgba(255,255,255,0.4)"/><circle cx="20" cy="80" r="0.6" fill="rgba(255,255,255,0.25)"/></svg>') repeat;
+            background-size: cover, 100px 100px; /* Cover for gradient, tile for stars */
+            position: relative; /* For z-indexing of elements */
+        }
+
+        /*
+            Main container for all elements to provide a relative positioning context.
+        */
+        .space-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        /*
+            Central abstract "time" element, resembling an hourglass or spiral.
+            It pulsates and shifts colors.
+        */
+        .time-element {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 30vmin; /* Responsive size */
+            height: 30vmin;
+            border-radius: 50%; /* Starts as a circle */
+            transform: translate(-50%, -50%) rotate(0deg); /* Center and prepare for rotation */
+            will-change: transform, background, box-shadow;
+            z-index: 5; /* Ensure it's in the foreground */
+
+            /* Conic gradient for a shimmering, spiral-like effect with color shifts */
+            background: conic-gradient(
+                from 0deg,
+                var(--color-start) 0%,
+                var(--color-mid1) 25%,
+                var(--color-mid2) 50%,
+                var(--color-end) 75%,
+                var(--color-start) 100%
+            );
+            /* Initial colors */
+            --color-start: rgba(173, 216, 230, 0.4); /* Pale blue */
+            --color-mid1: rgba(224, 187, 228, 0.4); /* Lavender */
+            --color-mid2: rgba(127, 255, 212, 0.4); /* Cosmic Teal (Aqua) */
+            --color-end: rgba(255, 215, 0, 0.4);   /* Soft Gold */
+
+            filter: blur(15px) contrast(1.2); /* Soft blur, slight contrast boost */
+            opacity: 0.9; /* Translucent */
+            /* Pulsating glow */
+            box-shadow: 0 0 30px rgba(var(--shadow-color-rgb), 0.6),
+                        0 0 60px rgba(var(--shadow-color-rgb), 0.4);
+            --shadow-color-rgb: 173, 216, 230; /* Default shadow color */
+
+            /* Main animation: rotate, pulsate, color shift */
+            animation: rotateTime 8s linear infinite,
+                       pulseTime 4s ease-in-out infinite alternate,
+                       colorShiftTime 8s linear infinite;
+        }
+
+        /* Keyframe animation for the time element's rotation */
+        @keyframes rotateTime {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        /* Keyframe animation for the time element's pulsating effect */
+        @keyframes pulseTime {
+            0%, 100% {
+                transform: translate(-50%, -50%) rotate(var(--current-rotation, 0deg)) scale(1);
+                box-shadow: 0 0 30px rgba(var(--shadow-color-rgb), 0.6), 0 0 60px rgba(var(--shadow-color-rgb), 0.4);
+            }
+            50% {
+                transform: translate(-50%, -50%) rotate(var(--current-rotation, 0deg)) scale(1.05);
+                box-shadow: 0 0 45px rgba(var(--shadow-color-rgb), 0.8), 0 0 90px rgba(var(--shadow-color-rgb), 0.6);
+            }
+        }
+
+        /* Keyframe animation for the time element's color shift */
+        @keyframes colorShiftTime {
+            0% {
+                --color-start: rgba(173, 216, 230, 0.4);
+                --color-mid1: rgba(224, 187, 228, 0.4);
+                --color-mid2: rgba(127, 255, 212, 0.4);
+                --color-end: rgba(255, 215, 0, 0.4);
+                --shadow-color-rgb: 173, 216, 230;
+            }
+            25% {
+                --color-start: rgba(224, 187, 228, 0.4);
+                --color-mid1: rgba(127, 255, 212, 0.4);
+                --color-mid2: rgba(255, 215, 0, 0.4);
+                --color-end: rgba(173, 216, 230, 0.4);
+                --shadow-color-rgb: 224, 187, 228;
+            }
+            50% {
+                --color-start: rgba(127, 255, 212, 0.4);
+                --color-mid1: rgba(255, 215, 0, 0.4);
+                --color-mid2: rgba(173, 216, 230, 0.4);
+                --color-end: rgba(224, 187, 228, 0.4);
+                --shadow-color-rgb: 127, 255, 212;
+            }
+            75% {
+                --color-start: rgba(255, 215, 0, 0.4);
+                --color-mid1: rgba(173, 216, 230, 0.4);
+                --color-mid2: rgba(224, 187, 228, 0.4);
+                --color-end: rgba(127, 255, 212, 0.4);
+                --shadow-color-rgb: 255, 215, 0;
+            }
+            100% {
+                --color-start: rgba(173, 216, 230, 0.4);
+                --color-mid1: rgba(224, 187, 228, 0.4);
+                --color-mid2: rgba(127, 255, 212, 0.4);
+                --color-end: rgba(255, 215, 0, 0.4);
+                --shadow-color-rgb: 173, 216, 230;
+            }
+        }
+
+        /* Ethereal nebulae-like clouds */
+        .nebula-cloud {
+            position: absolute;
+            width: 40vmin;
+            height: 40vmin;
+            border-radius: 50%;
+            background: radial-gradient(circle at center, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            filter: blur(50px); /* Heavy blur for wispy effect */
+            opacity: 0.2; /* Very subtle */
+            will-change: transform, opacity;
+            animation: nebulaDrift 15s ease-in-out infinite alternate,
+                       nebulaPulse 8s linear infinite alternate;
+            z-index: 1; /* Behind time element */
+        }
+        /* Specific positions and colors for nebulae */
+        .nebula-cloud:nth-child(1) {
+            top: 10%; left: 10%;
+            background: radial-gradient(circle at center, rgba(100, 100, 255, 0.15) 0%, transparent 70%);
+            animation-delay: 0s;
+        }
+        .nebula-cloud:nth-child(2) {
+            top: 70%; left: 60%;
+            width: 50vmin; height: 50vmin;
+            background: radial-gradient(circle at center, rgba(255, 100, 200, 0.15) 0%, transparent 70%);
+            animation-delay: -5s;
+        }
+        .nebula-cloud:nth-child(3) {
+            top: 20%; left: 80%;
+            width: 35vmin; height: 35vmin;
+            background: radial-gradient(circle at center, rgba(100, 255, 100, 0.15) 0%, transparent 70%);
+            animation-delay: -10s;
+        }
+
+        /* Keyframe for nebula drifting */
+        @keyframes nebulaDrift {
+            0% { transform: translate(0, 0); }
+            50% { transform: translate(5vw, 5vh); }
+            100% { transform: translate(0, 0); }
+        }
+        /* Keyframe for subtle nebula pulsing */
+        @keyframes nebulaPulse {
+            0%, 100% { opacity: 0.2; transform: scale(1); }
+            50% { opacity: 0.3; transform: scale(1.05); }
+        }
+
+        /* Styling for dynamically generated star/particle dots */
+        .cosmic-particle {
+            position: absolute;
+            border-radius: 50%;
+            background-color: var(--particle-color);
+            opacity: 0;
+            will-change: transform, opacity;
+            pointer-events: none;
+            z-index: 2; /* Between background and time element */
+
+            /* Animation defined in JS, uses CSS variables for path */
+            animation: particleDrift var(--duration) linear infinite;
+        }
+
+        /* Keyframe for general particle drift and fade */
+        @keyframes particleDrift {
+            0% {
+                transform: translate(var(--start-x), var(--start-y)) scale(var(--initial-scale));
+                opacity: 0;
+            }
+            10% { opacity: var(--max-opacity); }
+            50% {
+                transform: translate(var(--mid-x), var(--mid-y)) scale(var(--mid-scale));
+                opacity: var(--max-opacity);
+            }
+            90% { opacity: var(--max-opacity); }
+            100% {
+                transform: translate(var(--end-x), var(--end-y)) scale(var(--final-scale));
+                opacity: 0;
+            }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .time-element {
+                width: 40vmin; /* Larger on mobile */
+                height: 40vmin;
+                filter: blur(10px) contrast(1.2);
+            }
+            .nebula-cloud {
+                filter: blur(30px); /* Less blur for performance */
+                opacity: 0.15;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="space-container">
+        <!-- Ethereal nebulae clouds -->
+        <div class="nebula-cloud"></div>
+        <div class="nebula-cloud"></div>
+        <div class="nebula-cloud"></div>
+
+        <!-- The central abstract time element -->
+        <div class="time-element"></div>
+
+        <!-- Dynamic cosmic particles will be added here by JavaScript -->
+    </div>
+
+    <script>
+        const spaceContainer = document.querySelector('.space-container');
+        const timeElement = document.querySelector('.time-element');
+
+        const NUM_PARTICLES = 100; // Number of small particles/stars
+        const MIN_PARTICLE_SIZE = 1; // pixels
+        const MAX_PARTICLE_SIZE = 3; // pixels
+        const MIN_PARTICLE_DURATION = 10; // seconds
+        const MAX_PARTICLE_DURATION = 25; // seconds
+
+        // Colors for particles (white, pale blue, lavender)
+        const particleColors = [
+            '#FFFFFF',    // White
+            '#ADD8E6',    // Pale Blue
+            '#E0BBE4'     // Lavender
+        ];
+
+        /**
+         * Creates and animates a single cosmic particle.
+         */
+        function createCosmicParticle() {
+            const particle = document.createElement('div');
+            particle.classList.add('cosmic-particle');
+
+            // Randomize properties for each particle
+            const size = Math.random() * (MAX_PARTICLE_SIZE - MIN_PARTICLE_SIZE) + MIN_PARTICLE_SIZE;
+            const duration = Math.random() * (MAX_PARTICLE_DURATION - MIN_PARTICLE_DURATION) + MIN_PARTICLE_DURATION;
+            const delay = Math.random() * duration;
+
+            const color = particleColors[Math.floor(Math.random() * particleColors.length)];
+            const maxOpacity = 0.5 + Math.random() * 0.5; // Opacity between 0.5 and 1
+
+            // Randomize animation path coordinates using viewport units for responsiveness
+            const startX = `${Math.random() * 100}vw`;
+            const startY = `${Math.random() * 100}vh`;
+            const point1X = `${Math.random() * 100}vw`;
+            const point1Y = `${Math.random() * 100}vh`;
+            const point2X = `${Math.random() * 100}vw`;
+            const point2Y = `${Math.random() * 100}vh`;
+            const point3X = `${Math.random() * 100}vw`;
+            const point3Y = `${Math.random() * 100}vh`;
+            const endX = `${Math.random() * 100}vw`;
+            const endY = `${Math.random() * 100}vh`;
+
+            particle.style.width = `${size}px`;
+            particle.style.height = `${size}px`;
+            particle.style.setProperty('--particle-color', color);
+            particle.style.setProperty('--max-opacity', maxOpacity);
+            particle.style.setProperty('--duration', `${duration}s`);
+            particle.style.setProperty('--start-x', startX);
+            particle.style.setProperty('--start-y', startY);
+            particle.style.setProperty('--point1-x', point1X);
+            particle.style.setProperty('--point1-y', point1Y);
+            particle.style.setProperty('--point2-x', point2X);
+            particle.style.setProperty('--point2-y', point2Y);
+            particle.style.setProperty('--point3-x', point3X);
+            particle.style.setProperty('--point3-y', point3Y);
+            particle.style.setProperty('--end-x', endX);
+            particle.style.setProperty('--end-y', endY);
+            particle.style.animationDelay = `-${delay}s`;
+
+            spaceContainer.appendChild(particle);
+
+            // When an animation iteration ends, remove and create a new one
+            particle.addEventListener('animationiteration', () => {
+                particle.remove();
+                createCosmicParticle();
+            });
+        }
+
+        /**
+         * Initializes the animation by creating the initial set of cosmic particles.
+         */
+        function initCosmicSwarm() {
+            for (let i = 0; i < NUM_PARTICLES; i++) {
+                createCosmicParticle();
+            }
+        }
+
+        // Initialize the rotation variable for the time element
+        let currentRotation = 0;
+        function updateTimeElementRotation() {
+            // Get the current rotation from the CSS variable, if set
+            const computedStyle = getComputedStyle(timeElement);
+            const currentTransform = computedStyle.getPropertyValue('transform');
+            // If the element has a computed transform, try to extract the rotation
+            if (currentTransform && currentTransform !== 'none') {
+                const matrix = new DOMMatrixReadOnly(currentTransform);
+                currentRotation = Math.atan2(matrix.m21, matrix.m11) * (180 / Math.PI); // Convert radians to degrees
+            }
+            timeElement.style.setProperty('--current-rotation', `${currentRotation}deg`);
+            requestAnimationFrame(updateTimeElementRotation);
+        }
+
+
+        // Start the animations when the window has fully loaded
+        window.onload = () => {
+            initCosmicSwarm();
+            // Start updating the rotation variable for time element
+            updateTimeElementRotation();
+        };
+    </script>
+</body>
+</html>

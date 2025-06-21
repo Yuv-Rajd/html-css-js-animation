@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glowing Orb Collision</title>
+    <!--
+        This CSS creates a full-screen, ASMR-inspired animation of glowing orbs
+        that fluidly collide, merge, and split. It uses CSS transforms for motion
+        and scaling, radial gradients for luminosity, box-shadow for glowing effects,
+        and mix-blend-mode for translucent overlaps.
+    -->
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden; /* Prevent scrollbars for a clean full-screen experience */
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* Dark gradient background: deep indigo fading to soft purple */
+            background: linear-gradient(135deg, #2c003e 0%, #4a007b 50%, #6f00ab 100%);
+        }
+
+        /*
+            The main container for all the glowing orbs.
+            It spans the entire screen and serves as the stage for their dance.
+        */
+        .orbs-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden; /* Ensure orbs are clipped if they go out of bounds */
+        }
+
+        /*
+            Styling for an individual glowing orb.
+            Each orb is a circular div with a radial gradient for luminosity and a pulsating glow.
+        */
+        .orb {
+            position: absolute;
+            width: 80px; /* Base size of the orb */
+            height: 80px;
+            border-radius: 50%; /* Makes the div perfectly circular */
+            will-change: transform, opacity; /* Optimize for animation performance */
+            /*
+                Radial gradient for a luminous, ethereal appearance.
+                Uses a custom property for the main orb color.
+            */
+            background: radial-gradient(circle at 30% 30%, #ffffff 0%,
+                                        rgba(255, 255, 255, 0.8) 15%,
+                                        var(--orb-color) 60%,
+                                        rgba(var(--orb-color-rgb), 0.5) 100%);
+            /*
+                Multiple box-shadows to create a soft, pulsating glow effect.
+                Different spreads and colors create a layered glow.
+            */
+            box-shadow:
+                0 0 10px rgba(var(--orb-color-rgb), 0.7), /* Inner glow */
+                0 0 20px rgba(var(--orb-color-rgb), 0.5), /* Medium glow */
+                0 0 40px rgba(var(--orb-color-rgb), 0.3); /* Outer, softer glow */
+
+            filter: blur(1px); /* Slight blur on the orb itself for softness */
+            /*
+                mix-blend-mode: screen creates a luminous effect when colors overlap,
+                making them appear to "mix" and brighten, simulating merging.
+            */
+            mix-blend-mode: screen;
+
+            /* Default animation properties, overridden via specific classes/inline styles */
+            animation: orbMove 25s ease-in-out infinite, orbPulse 3s ease-in-out infinite alternate;
+        }
+
+        /* Define specific colors and RGB values for each orb */
+        .orb:nth-child(1) {
+            --orb-color: #ffb6c1; /* Pastel Pink */
+            --orb-color-rgb: 255, 182, 193;
+            left: 20%; top: 20%;
+            animation-delay: 0s;
+        }
+        .orb:nth-child(2) {
+            --orb-color: #7fffd4; /* Aqua */
+            --orb-color-rgb: 127, 255, 212;
+            left: 70%; top: 30%;
+            animation-delay: 2s;
+        }
+        .orb:nth-child(3) {
+            --orb-color: #e0bbe4; /* Lavender */
+            --orb-color-rgb: 224, 187, 228;
+            left: 40%; top: 70%;
+            animation-delay: 4s;
+        }
+        .orb:nth-child(4) {
+            --orb-color: #add8e6; /* Light Blue */
+            --orb-color-rgb: 173, 216, 230;
+            left: 10%; top: 60%;
+            animation-delay: 6s;
+        }
+        .orb:nth-child(5) {
+            --orb-color: #ffe4e1; /* Misty Rose (very pale pink) */
+            --orb-color-rgb: 255, 228, 225;
+            left: 80%; top: 80%;
+            animation-delay: 8s;
+        }
+
+
+        /*
+            Keyframe animation for the orb's movement, including collision, merging, and splitting.
+            This sequence simulates the orbs moving towards a common point, expanding (merging),
+            and then returning to individual forms.
+        */
+        @keyframes orbMove {
+            0% { transform: translate(0, 0) scale(1); }
+            10% { transform: translate(10vw, -10vh) scale(1.1); } /* Move and slightly expand */
+            20% { transform: translate(20vw, 5vh) scale(1.2); opacity: 1; } /* Closer to collision/merge point */
+            25% { transform: translate(25vw, 10vh) scale(1.5); opacity: 0.9; } /* Peak merge scale */
+            30% { transform: translate(30vw, 15vh) scale(1.2); opacity: 1; } /* Splitting start */
+            40% { transform: translate(40vw, -5vh) scale(1.1); }
+            50% { transform: translate(50vw, 0vh) scale(1); } /* Individual again */
+            60% { transform: translate(40vw, 5vh) scale(1.1); } /* Another move towards potential merge */
+            70% { transform: translate(30vw, -10vh) scale(1.2); }
+            75% { transform: translate(25vw, -15vh) scale(1.5); opacity: 0.9; } /* Another merge peak */
+            80% { transform: translate(20vw, -20vh) scale(1.2); opacity: 1; } /* Splitting again */
+            90% { transform: translate(10vw, -10vh) scale(1.1); }
+            100% { transform: translate(0, 0) scale(1); }
+        }
+
+        /*
+            Keyframe animation for the subtle pulsating glow of the orbs.
+        */
+        @keyframes orbPulse {
+            0%, 100% {
+                box-shadow:
+                    0 0 10px rgba(var(--orb-color-rgb), 0.7),
+                    0 0 20px rgba(var(--orb-color-rgb), 0.5),
+                    0 0 40px rgba(var(--orb-color-rgb), 0.3);
+            }
+            50% {
+                box-shadow:
+                    0 0 15px rgba(var(--orb-color-rgb), 0.8),
+                    0 0 25px rgba(var(--orb-color-rgb), 0.6),
+                    0 0 50px rgba(var(--orb-color-rgb), 0.4);
+            }
+        }
+
+        /*
+            Optional: Light bursts on simulated collision points.
+            These will briefly appear and fade.
+        */
+        .light-burst {
+            position: absolute;
+            width: 0px;
+            height: 0px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.7); /* White burst */
+            transform: translate(-50%, -50%); /* Center the burst element */
+            filter: blur(10px);
+            opacity: 0;
+            will-change: transform, opacity;
+            animation: burstFade 2s ease-out forwards; /* Fade out after appearing */
+            z-index: 10; /* Ensure bursts are on top */
+        }
+
+        @keyframes burstFade {
+            0% { width: 0px; height: 0px; opacity: 0; }
+            20% { width: 60px; height: 60px; opacity: 1; }
+            100% { width: 100px; height: 100px; opacity: 0; }
+        }
+
+        /* Responsive adjustments for smaller screens */
+        @media (max-width: 768px) {
+            .orb {
+                width: 60px; /* Smaller orbs on mobile */
+                height: 60px;
+                box-shadow:
+                    0 0 8px rgba(var(--orb-color-rgb), 0.7),
+                    0 0 15px rgba(var(--orb-color-rgb), 0.5),
+                    0 0 30px rgba(var(--orb-color-rgb), 0.3);
+                filter: blur(0.5px);
+            }
+            /* Adjust orb movement range for mobile */
+            @keyframes orbMove {
+                0% { transform: translate(0, 0) scale(1); }
+                10% { transform: translate(15vw, -15vh) scale(1.1); }
+                20% { transform: translate(30vw, 8vh) scale(1.2); opacity: 1; }
+                25% { transform: translate(35vw, 15vh) scale(1.4); opacity: 0.9; }
+                30% { transform: translate(40vw, 20vh) scale(1.2); opacity: 1; }
+                40% { transform: translate(50vw, -8vh) scale(1.1); }
+                50% { transform: translate(60vw, 0vh) scale(1); }
+                60% { transform: translate(50vw, 8vh) scale(1.1); }
+                70% { transform: translate(40vw, -15vh) scale(1.2); }
+                75% { transform: translate(35vw, -20vh) scale(1.4); opacity: 0.9; }
+                80% { transform: translate(30vw, -25vh) scale(1.2); opacity: 1; }
+                90% { transform: translate(15vw, -15vh) scale(1.1); }
+                100% { transform: translate(0, 0) scale(1); }
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="orbs-container">
+        <!-- Multiple glowing orb elements -->
+        <div class="orb"></div>
+        <div class="orb"></div>
+        <div class="orb"></div>
+        <div class="orb"></div>
+        <div class="orb"></div>
+    </div>
+
+    <script>
+        const orbs = document.querySelectorAll('.orb');
+        const orbsContainer = document.querySelector('.orbs-container');
+
+        /**
+         * Function to create a light burst effect at a specific location.
+         * This function will be called at points in the animation where
+         * a "collision" or "merge" is visually simulated.
+         * @param {number} x - The x-coordinate for the burst (relative to viewport).
+         * @param {number} y - The y-coordinate for the burst (relative to viewport).
+         */
+        function createLightBurst(x, y) {
+            const burst = document.createElement('div');
+            burst.classList.add('light-burst');
+            burst.style.left = `${x}px`;
+            burst.style.top = `${y}px`;
+            orbsContainer.appendChild(burst);
+
+            // Remove the burst after its animation completes
+            burst.addEventListener('animationend', () => {
+                burst.remove();
+            });
+        }
+
+        // Set up observers or a simple loop to trigger bursts at specific animation timings.
+        // For a true ASMR loop, these timings would align perfectly with the orbMove keyframes.
+        // This is a simplified example; a more complex system might track orb positions.
+        let animationCounter = 0;
+        const animationInterval = 25000; // Duration of orbMove animation
+        const burstPoints = [
+            0.25, /* 25% mark */
+            0.75  /* 75% mark */
+        ];
+
+        function monitorAnimation() {
+            animationCounter++;
+            const currentTime = (animationCounter * 16.66) % animationInterval; // Rough estimate of time in ms
+
+            // Trigger bursts at approximate merge points
+            // This is a simplified approach. For perfect sync, one would need
+            // to precisely calculate orb positions or use JS to animate
+            // alongside CSS animations.
+            burstPoints.forEach(point => {
+                const triggerTime = animationInterval * point;
+                // Check if current time is near a trigger point (e.g., within 500ms)
+                if (Math.abs(currentTime - triggerTime) < 500) {
+                    // Approximate center of the screen where a merge might occur
+                    const centerX = window.innerWidth / 2;
+                    const centerY = window.innerHeight / 2;
+                    createLightBurst(centerX, centerY);
+                }
+            });
+
+            requestAnimationFrame(monitorAnimation);
+        }
+
+        // Start monitoring for animation burst points (optional, for visual effect)
+        // requestAnimationFrame(monitorAnimation); // Uncomment to enable light bursts
+    </script>
+</body>
+</html>

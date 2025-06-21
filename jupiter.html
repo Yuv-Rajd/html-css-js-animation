@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jupiter and its Moons</title>
+    <!--
+        This CSS creates a full-screen, ASMR-inspired animation of Jupiter
+        and its orbiting moons. It features a deep cosmic background,
+        a dynamic Jupiter with swirling bands. Moons now orbit via JavaScript
+        to allow precise Z-index control for passing behind Jupiter.
+    -->
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden; /* Prevent scrollbars for a clean full-screen experience */
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* Deep cosmic background: inky black to deep indigo with faint twinkling stars */
+            background: radial-gradient(circle at center, #0a0a1a 0%, #000000 80%),
+                        url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><circle cx="10" cy="10" r="1" fill="rgba(255,255,255,0.3)"/><circle cx="50" cy="50" r="0.5" fill="rgba(255,255,255,0.2)"/><circle cx="90" cy="20" r="0.8" fill="rgba(255,255,255,0.4)"/><circle cx="20" cy="80" r="0.6" fill="rgba(255,255,255,0.25)"/></svg>') repeat;
+            background-size: cover, 100px 100px; /* Cover for gradient, tile for stars */
+            position: relative; /* For z-indexing of elements */
+        }
+
+        /*
+            Main container for the entire celestial scene.
+            It provides a relative positioning context for Jupiter and the moons.
+        */
+        .space-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            display: flex; /* Use flexbox to center Jupiter */
+            justify-content: center;
+            align-items: center;
+        }
+
+        /*
+            Styling for Jupiter, the large central planet.
+            It features animated bands and a subtle glow.
+        */
+        .jupiter {
+            position: relative; /* Essential for moons to orbit around its center */
+            width: 40vmin; /* Responsive size for Jupiter */
+            height: 40vmin;
+            border-radius: 50%; /* Spherical shape */
+            /* Base Jupiter color and texture using multiple linear gradients for bands */
+            background:
+                linear-gradient(to right, rgba(255,165,0,0.4), rgba(255,255,255,0.2), rgba(255,165,0,0.4)), /* Amber band */
+                linear-gradient(to right, rgba(255,250,205,0.3), rgba(255,255,255,0.1), rgba(255,250,205,0.3)), /* Cream band */
+                linear-gradient(to right, rgba(255,99,71,0.4), rgba(255,255,255,0.2), rgba(255,99,71,0.4)); /* Soft red band */
+            background-size: 300% 10% /* Wide bands, thin height */;
+            background-repeat: repeat-y; /* Repeat vertically */
+            background-position:
+                0% 20%, /* Amber band position */
+                0% 50%, /* Cream band position */
+                0% 80%; /* Red band position */
+            overflow: hidden; /* Ensure bands are clipped */
+            z-index: 2; /* Jupiter's fixed Z-index */
+
+            /* Glowing effect for Jupiter */
+            box-shadow: 0 0 50px rgba(255, 165, 0, 0.5), /* Amber glow */
+                        0 0 100px rgba(255, 255, 255, 0.1); /* White ambient glow */
+            filter: contrast(1.1); /* Slight contrast to make bands pop */
+
+            /* Animation for swirling bands */
+            animation: swirlBands 25s linear infinite;
+            background-color: #000000;
+        }
+
+        /* Keyframe animation for Jupiter's swirling bands */
+        @keyframes swirlBands {
+            0% { background-position: 0% 20%, 0% 50%, 0% 80%; }
+            100% { background-position: 200% 20%, 200% 50%, 200% 80%; } /* Animate horizontally across 200% */
+        }
+
+        /*
+            Styling for an individual moon.
+            Moons orbit Jupiter, their positions and Z-index are now controlled by JavaScript.
+        */
+        .moon {
+            position: absolute;
+            border-radius: 50%; /* Spherical shape for moons */
+            /* Z-index will be dynamically set by JS */
+            filter: blur(0.2px); /* Very slight blur for softness */
+            will-change: transform, box-shadow, z-index; /* Optimize for animation */
+
+            /* Placeholder for moon-specific properties - values are set/read by JS */
+            --moon-size: 10px;
+            --moon-color: #fff;
+            --moon-glow-color: rgba(255,255,255,0.5);
+            --orbit-radius-x: 20vmin;
+            --orbit-radius-y: 10vmin;
+            --orbit-speed: 20s;
+            --orbit-delay: 0s;
+
+            width: var(--moon-size);
+            height: var(--moon-size);
+            background: radial-gradient(circle at 30% 30%, #ffffff, var(--moon-color));
+            box-shadow: 0 0 10px var(--moon-glow-color); /* Subtle glow for the moon */
+
+            /* Only moonGlow animation remains in CSS, orbit is JS-driven */
+            animation: moonGlow calc(var(--orbit-speed) / 4) ease-in-out infinite alternate;
+            animation-delay: var(--orbit-delay);
+        }
+
+        /* Keyframe for subtle moon glow pulsation (light trail effect) */
+        @keyframes moonGlow {
+            0%, 100% { box-shadow: 0 0 10px var(--moon-glow-color), 0 0 15px rgba(var(--moon-glow-color-rgb), 0.2); }
+            50% { box-shadow: 0 0 15px var(--moon-glow-color), 0 0 25px rgba(var(--moon-glow-color-rgb), 0.4); }
+        }
+
+
+        /* Specific moons with their unique properties */
+        .moon.io {
+            --moon-size: 16px;
+            --moon-color: #ff4500; /* Volcanic Red */
+            --moon-glow-color: rgba(255,69,0,0.6);
+            --moon-glow-color-rgb: 255,69,0;
+            --orbit-radius-x: 30vmin;
+            --orbit-radius-y: 15vmin;
+            --orbit-speed: 18s;
+            --orbit-delay: 0s;
+        }
+
+        .moon.europa {
+            --moon-size: 14px;
+            --moon-color: #87ceeb; /* Icy Blue */
+            --moon-glow-color: rgba(135,206,235,0.6);
+            --moon-glow-color-rgb: 135,206,235;
+            --orbit-radius-x: 40vmin;
+            --orbit-radius-y: 20vmin;
+            --orbit-speed: 24s;
+            --orbit-delay: -5s;
+        }
+
+        .moon.ganymede {
+            --moon-size: 20px; /* Largest moon */
+            --moon-color: #a9a9a9; /* Dark Gray (rocky) */
+            --moon-glow-color: rgba(169,169,169,0.6);
+            --moon-glow-color-rgb: 169,169,169;
+            --orbit-radius-x: 50vmin;
+            --orbit-radius-y: 25vmin;
+            --orbit-speed: 30s;
+            --orbit-delay: -10s;
+        }
+
+        .moon.callisto {
+            --moon-size: 18px;
+            --moon-color: #8b4513; /* SaddleBrown (cratered surface) */
+            --moon-glow-color: rgba(139,69,19,0.6);
+            --moon-glow-color-rgb: 139,69,19;
+            --orbit-radius-x: 60vmin;
+            --orbit-radius-y: 30vmin;
+            --orbit-speed: 36s;
+            --orbit-delay: -15s;
+        }
+
+
+        /* Responsive adjustments for smaller screens */
+        @media (max-width: 768px) {
+            .jupiter {
+                width: 50vmin; /* Larger Jupiter on mobile */
+                height: 50vmin;
+            }
+            /* Adjust moon sizes proportionally */
+            .moon.io { --moon-size: 14px; }
+            .moon.europa { --moon-size: 12px; }
+            .moon.ganymede { --moon-size: 18px; }
+            .moon.callisto { --moon-size: 16px; }
+
+            /* Adjust orbit radii for mobile to ensure they fit */
+            .moon.io { --orbit-radius-x: 35vmin; --orbit-radius-y: 18vmin; }
+            .moon.europa { --orbit-radius-x: 45vmin; --orbit-radius-y: 22vmin; }
+            .moon.ganymede { --orbit-radius-x: 55vmin; --orbit-radius-y: 28vmin; }
+            .moon.callisto { --orbit-radius-x: 65vmin; --orbit-radius-y: 32vmin; }
+        }
+    </style>
+</head>
+<body>
+    <div class="space-container">
+        <!-- The central Jupiter planet -->
+        <div class="jupiter"></div>
+
+        <!-- The four Galilean moons, each with specific styling -->
+        <div class="moon io"></div>
+        <div class="moon europa"></div>
+        <div class="moon ganymede"></div>
+        <div class="moon callisto"></div>
+    </div>
+
+    <script>
+        const spaceContainer = document.querySelector('.space-container');
+        const jupiter = document.querySelector('.jupiter');
+        const moons = document.querySelectorAll('.moon');
+
+        const moonPhysics = [];
+        let lastUpdateTime = performance.now();
+
+        // Helper to convert vmin to pixels
+        function vminToPx(value) {
+            const viewportMin = Math.min(window.innerWidth, window.innerHeight);
+            return (value / 100) * viewportMin;
+        }
+
+        // Initialize moon physics properties
+        function initializeMoons() {
+            moons.forEach(moonElement => {
+                const computedStyle = getComputedStyle(moonElement);
+                const orbitRadiusX = vminToPx(parseFloat(computedStyle.getPropertyValue('--orbit-radius-x')));
+                const orbitRadiusY = vminToPx(parseFloat(computedStyle.getPropertyValue('--orbit-radius-y')));
+                const orbitSpeedSec = parseFloat(computedStyle.getPropertyValue('--orbit-speed'));
+                const orbitSpeedRadPerMs = (2 * Math.PI) / (orbitSpeedSec * 1000); // Radians per millisecond
+                const initialDelaySec = parseFloat(computedStyle.getPropertyValue('--orbit-delay'));
+
+                moonPhysics.push({
+                    element: moonElement,
+                    orbitRadiusX: orbitRadiusX,
+                    orbitRadiusY: orbitRadiusY,
+                    orbitSpeed: orbitSpeedRadPerMs,
+                    currentAngle: initialDelaySec ? (initialDelaySec / orbitSpeedSec) * (2 * Math.PI) : 0, // Initial angle based on delay
+                });
+            });
+
+            requestAnimationFrame(gameLoop); // Start the animation loop
+        }
+
+        // Update moon positions and Z-index
+        function updateMoonPositions(deltaTime) {
+            const jupiterRect = jupiter.getBoundingClientRect();
+            const jupiterCenterX = jupiterRect.left + jupiterRect.width / 2;
+            const jupiterCenterY = jupiterRect.top + jupiterRect.height / 2;
+
+            moonPhysics.forEach(moon => {
+                // Update current angle
+                moon.currentAngle += moon.orbitSpeed * deltaTime;
+
+                // Ensure angle stays within 0 to 2*PI
+                moon.currentAngle %= (2 * Math.PI);
+                if (moon.currentAngle < 0) moon.currentAngle += (2 * Math.PI);
+
+                // Calculate X and Y offsets from Jupiter's center
+                // Use Math.cos for X and Math.sin for Y for counter-clockwise ellipse
+                const offsetX = moon.orbitRadiusX * Math.cos(moon.currentAngle);
+                const offsetY = moon.orbitRadiusY * Math.sin(moon.currentAngle);
+
+                // Apply position using translate, relative to Jupiter's center
+                moon.element.style.transform = `translate(-50%, -50%) translate(${offsetX}px, ${offsetY}px)`;
+
+                // Z-index logic: Pass behind Jupiter when on the "far" half of the orbit.
+                // For an ellipse viewed head-on, this is when the Y-component (vertical) is positive,
+                // implying it's "above" the center line and moving away from the viewer.
+                // For a standard celestial orbit, the far side usually corresponds to
+                // a range of angles where the moon is visually moving "up" and "away".
+                // In a simple 2D ellipse `(X=R_x cos(A), Y=R_y sin(A))`,
+                // if Y is positive, it's on the upper half.
+                // If we want it to go behind when moving left-to-right (from right side of Jupiter to left side)
+                // then angles from PI/2 to 3*PI/2 (90 to 270 degrees)
+                if (moon.currentAngle > Math.PI  && moon.currentAngle < (2 * Math.PI)) {
+                     moon.element.style.zIndex = 1; // Behind Jupiter (Jupiter is z-index: 1)
+                } else {
+                     moon.element.style.zIndex = 3; // In front of Jupiter
+                }
+
+                // If the moons are positioned absolutely relative to `space-container`
+                // and `jupiter` is flexbox centered, moons need to be offset from center of `space-container`.
+                // This is covered by the `translate(-50%, -50%)` on the moon and adding its offset.
+                // Their absolute `left`/`top` would be:
+                // moon.element.style.left = `${jupiterCenterX}px`;
+                // moon.element.style.top = `${jupiterCenterY}px`;
+                // But `transform: translate` on element itself is sufficient when parent is centered.
+            });
+        }
+
+        // Main animation loop
+        function gameLoop(currentTime) {
+            const deltaTime = currentTime - lastUpdateTime;
+            lastUpdateTime = currentTime;
+
+            updateMoonPositions(deltaTime);
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Adjust moon orbit radii on resize
+        window.addEventListener('resize', () => {
+            moonPhysics.length = 0; // Clear existing data
+            initializeMoons(); // Re-initialize to get updated vmin values
+        });
+
+        // Start the animation when the window has fully loaded
+        window.onload = initializeMoons;
+    </script>
+</body>
+</html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Time in Vast Space Animation</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<style>
+    body {
+  margin: 0;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #0a0a23;
+  overflow: hidden;
+}
+.container {
+  width: 100%;
+  height: 100%;
+  max-width: 1200px;
+  max-height: 600px;
+  position: relative;
+}
+svg {
+  width: 100%;
+  height: 100%;
+}
+.galaxy {
+  animation: pulse 8s infinite ease-in-out;
+}
+.star {
+  animation: twinkle 4s infinite ease-in-out;
+}
+.particle {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: radial-gradient(circle, #fff, #00b7eb);
+  border-radius: 50%;
+  filter: blur(2px);
+}
+.particle:nth-child(2) { top: 20%; left: 10%; animation: orbit 6s infinite linear; }
+.particle:nth-child(3) { top: 60%; left: 80%; animation: orbit 7s infinite linear 1s; }
+.particle:nth-child(4) { top: 40%; left: 50%; animation: orbit 8s infinite linear 2s; }
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.2); opacity: 1; }
+}
+@keyframes twinkle {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+@keyframes orbit {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  100% { transform: translate(100px, 50px) rotate(360deg); }
+}
+@media (max-width: 768px) {
+  .container { max-height: 400px; }
+  .particle { animation-duration: 5s; }
+}
+</style>
+<body>
+  <div class="container">
+    <svg width="100%" height="100%" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid slice">
+      <defs>
+        <linearGradient id="nebulaGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:#4b0082;stop-opacity:0.8" />
+          <stop offset="100%" style="stop-color:#00b7eb;stop-opacity:0.8" />
+          <animate attributeName="x1" from="0%" to="100%" dur="12s" repeatCount="indefinite" />
+          <animate attributeName="x2" from="100%" to="0%" dur="12s" repeatCount="indefinite" />
+        </linearGradient>
+        <filter id="glow">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="3" />
+        </filter>
+      </defs>
+      <rect width="100%" height="100%" fill="#0a0a23" />
+      <circle cx="500" cy="300" r="100" fill="url(#nebulaGradient)" class="galaxy" filter="url(#glow)" />
+      <circle cx="200" cy="200" r="5" fill="#fff" class="star" filter="url(#glow)" />
+      <circle cx="800" cy="400" r="4" fill="#fff" class="star" filter="url(#glow)" />
+    </svg>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+  </div>
+</body>
+</html>

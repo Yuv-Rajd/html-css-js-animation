@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Drip Cascade</title>
+    <!--
+        This CSS sets up a full-screen animation featuring colored "drips"
+        that fall from the top, blend as they overlap, and create a
+        mesmerizing cascade effect, inspired by ASMR visuals.
+    -->
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden; /* Prevent scrollbars */
+            background-color: #1a1a2e; /* Deep dark blue-purple background for contrast */
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative; /* Needed for absolute positioning of drips */
+        }
+
+        /*
+            The container for the falling drips.
+            It spans the entire screen and manages the overflow of drips
+            as they move downwards.
+        */
+        .drip-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden; /* Ensure drips are clipped when out of bounds */
+            /* Using a filter on the container can enhance the overall blend if needed,
+               but individual drip blending with mix-blend-mode is primary. */
+            filter: saturate(1.2); /* Slightly boost color saturation */
+        }
+
+        /*
+            Styling for an individual color drip.
+            Each drip is a rounded div that animates downwards.
+            mix-blend-mode is crucial for the "mixing paints" effect.
+        */
+        .drip {
+            position: absolute;
+            width: 60px; /* Base width of the drip */
+            height: 60px; /* Base height of the drip (can be adjusted for oval shape) */
+            border-radius: 50%; /* Makes the drip circular */
+            filter: blur(15px); /* Soften the edges of each drip */
+            opacity: 0.8; /* Slight transparency for blending */
+            will-change: transform, opacity; /* Optimize for animation performance */
+
+            /*
+                mix-blend-mode: screen creates a luminous effect when colors overlap,
+                making them appear to "mix" and brighten on a dark background.
+                This is ideal for the "paint blending" visual.
+            */
+            mix-blend-mode: screen;
+
+            /* Default animation properties, overridden per drip via inline style or specific classes */
+            animation: dripFall 10s linear infinite;
+        }
+
+        /* Define the keyframe animation for the drips falling down */
+        @keyframes dripFall {
+            0% {
+                transform: translateY(-100px) scale(0.8); /* Start above screen, slightly smaller */
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.8; /* Fade in as it enters the screen */
+            }
+            80% {
+                opacity: 0.8; /* Maintain opacity for most of the fall */
+            }
+            100% {
+                transform: translateY(calc(100vh + 100px)) scale(1.2); /* Fall past screen, slightly larger */
+                opacity: 0; /* Fade out as it leaves the screen */
+            }
+        }
+
+        /*
+            Optional: A "pool" area at the bottom where drips might visually collect.
+            This could be achieved by using a slightly different blend mode or color,
+            but for a simple cascade, the overlapping drips themselves create the pool effect.
+        */
+        .bottom-pool {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 150px; /* Height of the "pool" area */
+            background: linear-gradient(to top, rgba(0,0,0,0.5), transparent); /* Darken bottom for depth */
+            mix-blend-mode: normal; /* This area should not blend with the drips in the same way */
+            z-index: 0; /* Ensure it's behind the falling drips */
+        }
+
+        /* Responsive adjustments for smaller screens */
+        @media (max-width: 768px) {
+            .drip {
+                width: 40px;
+                height: 40px;
+                filter: blur(10px); /* Slightly less blur on mobile for performance */
+            }
+            /* Adjust animation properties if needed for mobile, e.g., faster fall or less spread */
+            @keyframes dripFall {
+                0% {
+                    transform: translateY(-80px) scale(0.7);
+                    opacity: 0;
+                }
+                100% {
+                    transform: translateY(calc(100vh + 80px)) scale(1.1);
+                    opacity: 0;
+                }
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="drip-container">
+        <!-- The bottom pool area (optional visual enhancement) -->
+        <div class="bottom-pool"></div>
+    </div>
+
+    <script>
+        const dripContainer = document.querySelector('.drip-container');
+        // Define a palette of vibrant colors for the drips
+        const colors = [
+            '#FF6347', // Tomato Red
+            '#4682B4', // Steel Blue
+            '#FFD700', // Gold Yellow
+            '#9ACD32', // Yellow Green
+            '#BA55D3', // Medium Orchid (Purple)
+            '#00CED1', // Dark Turquoise
+            '#FF4500'  // OrangeRed
+        ];
+
+        // Minimum and maximum duration for drip animation to vary speed
+        const minDuration = 8; // seconds
+        const maxDuration = 15; // seconds
+
+        // Minimum and maximum delay before a drip starts
+        const minDelay = 0; // seconds
+        const maxDelay = 8; // seconds
+
+        // Minimum and maximum size (width/height) for drips
+        const minSize = 40; // pixels
+        const maxSize = 100; // pixels
+
+        // How many drips to create at any given time
+        const numDrips = 50;
+
+        /**
+         * Creates a single drip element and appends it to the container.
+         * Sets random color, size, position, and animation properties.
+         */
+        function createDrip() {
+            const drip = document.createElement('div');
+            drip.classList.add('drip');
+
+            // Randomly select a color from the palette
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            drip.style.backgroundColor = color;
+
+            // Randomize starting X position
+            drip.style.left = `${Math.random() * 100}vw`;
+
+            // Randomize size
+            const size = Math.random() * (maxSize - minSize) + minSize;
+            drip.style.width = `${size}px`;
+            drip.style.height = `${size}px`;
+
+            // Randomize animation duration (speed of fall)
+            const duration = Math.random() * (maxDuration - minDuration) + minDuration;
+            drip.style.animationDuration = `${duration}s`;
+
+            // Randomize animation delay (when it starts)
+            const delay = Math.random() * (maxDelay - minDelay) + minDelay;
+            drip.style.animationDelay = `-${delay}s`; /* Negative delay makes it appear mid-animation */
+
+            // Append the drip to the container
+            dripContainer.appendChild(drip);
+
+            // Remove the drip after its animation completes to prevent DOM bloat
+            // This event fires when the 'dripFall' animation finishes.
+            drip.addEventListener('animationend', () => {
+                drip.remove(); // Remove the element from the DOM
+                createDrip(); // Immediately create a new drip to maintain count
+            });
+        }
+
+        // Initialize a set number of drips to start the cascade
+        function initDrips() {
+            for (let i = 0; i < numDrips; i++) {
+                createDrip();
+            }
+        }
+
+        // Start the drip cascade when the window loads
+        window.onload = initDrips;
+    </script>
+</body>
+</html>

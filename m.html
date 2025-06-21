@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Newton's Cradle Reimagined</title>
+    <!--
+        This CSS creates a full-screen, ASMR-inspired animation that reimagines
+        Newton's Cradle. It features neon-glowing balls suspended by luminous threads,
+        swinging rhythmically with light trails and subtle impact effects.
+        Uses CSS transforms for pendulum motion, radial gradients for glow,
+        and pseudo-elements for threads.
+    -->
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden; /* Prevent scrollbars for a clean full-screen experience */
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #00001a; /* Very dark midnight blue/black background */
+            position: relative;
+        }
+
+        /*
+            Main container for the entire Newton's Cradle setup.
+            It's centered on the screen and provides the fixed point for the threads.
+        */
+        .cradle-container {
+            position: relative;
+            width: 80vmin; /* Responsive width based on viewport min dimension */
+            height: 60vmin; /* Responsive height */
+            /* This div acts as the top bar from which the pendulums hang */
+            background-color: rgba(50, 50, 80, 0.5); /* Semi-transparent dark bar */
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-around; /* Distribute balls evenly */
+            align-items: flex-start; /* Balls hang from the top */
+            padding-top: 20px; /* Space for the top attachment */
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.2); /* Subtle glow for the bar */
+        }
+
+        /*
+            Individual ball/pendulum unit.
+            Contains both the glowing ball and its thread (via pseudo-element).
+        */
+        .pendulum-ball {
+            position: absolute;
+            width: 70px; /* Size of the ball */
+            height: 70px;
+            border-radius: 50%; /* Make it perfectly circular */
+            /* Default background, overridden by specific colors */
+            background: radial-gradient(circle at 30% 30%, #ffffff 0%, #ffffff 15%, var(--ball-color) 60%, rgba(var(--ball-rgb), 0.5) 100%);
+            will-change: transform; /* Optimize for animation performance */
+            /* Initial position, adjusted by JavaScript later */
+            bottom: 0;
+            transform-origin: center -50vmin; /* Anchor point for rotation (upwards) */
+            z-index: 1; /* Ensure balls are in front of their threads */
+
+            /* Box shadow for glow and light trail effect */
+            box-shadow: 0 0 15px rgba(var(--ball-rgb), 0.8), /* Inner glow */
+                        0 0 30px rgba(var(--ball-rgb), 0.6), /* Medium glow */
+                        0 0 60px rgba(var(--ball-rgb), 0.4), /* Outer glow */
+                        /* Subtle light trail shadow, animated */
+                        0 0 0 rgba(var(--ball-rgb), 0);
+            filter: blur(0.5px); /* Slight blur for softness */
+        }
+
+        /* Pseudo-element for the thread */
+        .pendulum-ball::before {
+            content: '';
+            position: absolute;
+            top: -50vmin; /* Extends upwards to the pivot point */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px; /* Thickness of the thread */
+            height: 50vmin; /* Length of the thread */
+            background-color: rgba(255, 255, 255, 0.4); /* Luminous thread color */
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.2); /* Thread glow */
+            z-index: -1; /* Place thread behind the ball */
+        }
+
+        /* Define specific neon colors for each ball */
+        .pendulum-ball:nth-child(1) { --ball-color: #00ffff; --ball-rgb: 0, 255, 255; } /* Electric Blue */
+        .pendulum-ball:nth-child(2) { --ball-color: #ff00ff; --ball-rgb: 255, 0, 255; } /* Magenta */
+        .pendulum-ball:nth-child(3) { --ball-color: #00ff00; --ball-rgb: 0, 255, 0; } /* Lime Green */
+        .pendulum-ball:nth-child(4) { --ball-color: #ffaa00; --ball-rgb: 255, 170, 0; } /* Electric Orange */
+        .pendulum-ball:nth-child(5) { --ball-color: #8a2be2; --ball-rgb: 138, 43, 226; } /* BlueViolet */
+
+        /* Animations */
+
+        /* Swing animation for the leftmost ball */
+        @keyframes swingOutLeft {
+            0% { transform: rotate(0deg); }
+            /* Ball swings left for the first 25% of the cycle (1.5s in a 6s animation) */
+            25% { transform: rotate(-30deg); }
+            50% { transform: rotate(0deg); } /* Returns to center */
+            /* Stays at center for the remainder of the cycle (50% to 100%) */
+            100% { transform: rotate(0deg); }
+        }
+
+        /* Swing animation for the rightmost ball (delayed to react to the left ball) */
+        @keyframes swingOutRight {
+            0% { transform: rotate(0deg); } /* Stays at center for first 50% of the cycle */
+            50% { transform: rotate(0deg); }
+            /* Ball swings right for the next 25% of the cycle (3s to 4.5s) */
+            75% { transform: rotate(30deg); }
+            100% { transform: rotate(0deg); } /* Returns to center */
+        }
+
+        /* Light trail effect for the leftmost ball when swinging */
+        @keyframes trailOnSwingLeft {
+            0%, 40% { box-shadow: 0 0 15px rgba(var(--ball-rgb), 0.8), 0 0 30px rgba(var(--ball-rgb), 0.6), 0 0 60px rgba(var(--ball-rgb), 0.4), 0 0 0 rgba(var(--ball-rgb), 0); } /* No trail */
+            10% { box-shadow: 0 0 15px rgba(var(--ball-rgb), 0.8), 0 0 30px rgba(var(--ball-rgb), 0.6), 0 0 60px rgba(var(--ball-rgb), 0.4), -50px 0 30px rgba(var(--ball-rgb), 0.4); } /* Max trail left */
+            30% { box-shadow: 0 0 15px rgba(var(--ball-rgb), 0.8), 0 0 30px rgba(var(--ball-rgb), 0.6), 0 0 60px rgba(var(--ball-rgb), 0.4), -20px 0 10px rgba(var(--ball-rgb), 0.2); } /* Fading trail */
+            100% { box-shadow: 0 0 15px rgba(var(--ball-rgb), 0.8), 0 0 30px rgba(var(--ball-rgb), 0.6), 0 0 60px rgba(var(--ball-rgb), 0.4), 0 0 0 rgba(var(--ball-rgb), 0); } /* No trail */
+        }
+
+        /* Light trail effect for the rightmost ball when swinging */
+        @keyframes trailOnSwingRight {
+            0%, 60% { box-shadow: 0 0 15px rgba(var(--ball-rgb), 0.8), 0 0 30px rgba(var(--ball-rgb), 0.6), 0 0 60px rgba(var(--ball-rgb), 0.4), 0 0 0 rgba(var(--ball-rgb), 0); } /* No trail */
+            70% { box-shadow: 0 0 15px rgba(var(--ball-rgb), 0.8), 0 0 30px rgba(var(--ball-rgb), 0.6), 0 0 60px rgba(var(--ball-rgb), 0.4), 50px 0 30px rgba(var(--ball-rgb), 0.4); } /* Max trail right */
+            90% { box-shadow: 0 0 15px rgba(var(--ball-rgb), 0.8), 0 0 30px rgba(var(--ball-rgb), 0.6), 0 0 60px rgba(var(--ball-rgb), 0.4), 20px 0 10px rgba(var(--ball-rgb), 0.2); } /* Fading trail */
+            100% { box-shadow: 0 0 15px rgba(var(--ball-rgb), 0.8), 0 0 30px rgba(var(--ball-rgb), 0.6), 0 0 60px rgba(var(--ball-rgb), 0.4), 0 0 0 rgba(var(--ball-rgb), 0); } /* No trail */
+        }
+
+
+        /* Apply specific animations to the outer balls */
+        .pendulum-ball:first-child {
+            animation: swingOutLeft 6s ease-in-out infinite, trailOnSwingLeft 6s linear infinite;
+        }
+        .pendulum-ball:last-child {
+            animation: swingOutRight 6s ease-in-out infinite, trailOnSwingRight 6s linear infinite;
+        }
+
+        /* Responsive adjustments for smaller screens */
+        @media (max-width: 768px) {
+            .cradle-container {
+                width: 90vmin;
+                height: 70vmin;
+            }
+            .pendulum-ball {
+                width: 50px;
+                height: 50px;
+                box-shadow: 0 0 10px rgba(var(--ball-rgb), 0.8), 0 0 20px rgba(var(--ball-rgb), 0.6), 0 0 40px rgba(var(--ball-rgb), 0.4);
+            }
+            .pendulum-ball::before {
+                top: -40vmin;
+                height: 40vmin;
+            }
+            .pendulum-ball {
+                transform-origin: center -40vmin;
+            }
+            @keyframes swingOutLeft {
+                0% { transform: rotate(0deg); }
+                25% { transform: rotate(-25deg); } /* Slightly less swing on mobile */
+                50% { transform: rotate(0deg); }
+                100% { transform: rotate(0deg); }
+            }
+            @keyframes swingOutRight {
+                0% { transform: rotate(0deg); }
+                50% { transform: rotate(0deg); }
+                75% { transform: rotate(25deg); } /* Slightly less swing on mobile */
+                100% { transform: rotate(0deg); }
+            }
+            @keyframes trailOnSwingLeft {
+                0%, 40% { box-shadow: 0 0 10px rgba(var(--ball-rgb), 0.8), 0 0 20px rgba(var(--ball-rgb), 0.6), 0 0 40px rgba(var(--ball-rgb), 0.4), 0 0 0 rgba(var(--ball-rgb), 0); }
+                10% { box-shadow: 0 0 10px rgba(var(--ball-rgb), 0.8), 0 0 20px rgba(var(--ball-rgb), 0.6), 0 0 40px rgba(var(--ball-rgb), 0.4), -30px 0 20px rgba(var(--ball-rgb), 0.3); }
+                30% { box-shadow: 0 0 10px rgba(var(--ball-rgb), 0.8), 0 0 20px rgba(var(--ball-rgb), 0.6), 0 0 40px rgba(var(--ball-rgb), 0.4), -15px 0 10px rgba(var(--ball-rgb), 0.2); }
+                100% { box-shadow: 0 0 10px rgba(var(--ball-rgb), 0.8), 0 0 20px rgba(var(--ball-rgb), 0.6), 0 0 40px rgba(var(--ball-rgb), 0.4), 0 0 0 rgba(var(--ball-rgb), 0); }
+            }
+            @keyframes trailOnSwingRight {
+                0%, 60% { box-shadow: 0 0 10px rgba(var(--ball-rgb), 0.8), 0 0 20px rgba(var(--ball-rgb), 0.6), 0 0 40px rgba(var(--ball-rgb), 0.4), 0 0 0 rgba(var(--ball-rgb), 0); }
+                70% { box-shadow: 0 0 10px rgba(var(--ball-rgb), 0.8), 0 0 20px rgba(var(--ball-rgb), 0.6), 0 0 40px rgba(var(--ball-rgb), 0.4), 30px 0 20px rgba(var(--ball-rgb), 0.3); }
+                90% { box-shadow: 0 0 10px rgba(var(--ball-rgb), 0.8), 0 0 20px rgba(var(--ball-rgb), 0.6), 0 0 40px rgba(var(--ball-rgb), 0.4), 15px 0 10px rgba(var(--ball-rgb), 0.2); }
+                100% { box-shadow: 0 0 10px rgba(var(--ball-rgb), 0.8), 0 0 20px rgba(var(--ball-rgb), 0.6), 0 0 40px rgba(var(--ball-rgb), 0.4), 0 0 0 rgba(var(--ball-rgb), 0); }
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="cradle-container">
+        <!-- Balls are positioned using flexbox, then individually offset by JS -->
+        <div class="pendulum-ball"></div>
+        <div class="pendulum-ball"></div>
+        <div class="pendulum-ball"></div>
+        <div class="pendulum-ball"></div>
+        <div class="pendulum-ball"></div>
+    </div>
+
+    <script>
+        const cradleContainer = document.querySelector('.cradle-container');
+        const balls = document.querySelectorAll('.pendulum-ball');
+        const numBalls = balls.length;
+
+        // Calculate initial horizontal positions for balls
+        function setInitialBallPositions() {
+            const containerWidth = cradleContainer.offsetWidth;
+            const ballWidth = balls[0].offsetWidth; // Assuming all balls are same width
+            // Adjust total width to account for spacing between balls, ensuring they touch
+            const totalBallsEffectiveWidth = (numBalls * ballWidth) - (ballWidth * (numBalls - 1) * 0.1); // Slight overlap
+            const spacing = (containerWidth - totalBallsEffectiveWidth) / 2; // Center the whole group
+
+            balls.forEach((ball, index) => {
+                // Calculate position to make balls appear to touch
+                const leftPosition = spacing + (ballWidth * index * 0.9); // 0.9 to make them slightly overlap
+                ball.style.left = `${leftPosition}px`;
+                ball.style.transform = `translateX(0%)`; /* No extra translateX as left is precise */
+                ball.style.bottom = '10px'; /* Position slightly above the bottom of the container */
+            });
+        }
+
+        // Adjust positions on resize
+        window.addEventListener('resize', setInitialBallPositions);
+        // Set initial positions when the page loads
+        window.onload = setInitialBallPositions;
+    </script>
+</body>
+</html>

@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sand Grain Flow</title>
+    <!--
+        This CSS sets up a full-screen, ASMR-inspired animation of countless
+        tiny sand grains. It uses JavaScript to dynamically create and animate
+        individual grains with transform: translate for falling and swirling
+        motion, combined with randomized delays and a seamless loop.
+    -->
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden; /* Prevent scrollbars for a clean full-screen experience */
+            background-color: #f8f5ed; /* Soft, warm beige background */
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /*
+            Main container for all the sand grains.
+            It spans the entire screen and serves as the stage for the flowing sand.
+        */
+        .grain-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden; /* Ensure grains are clipped when out of bounds */
+        }
+
+        /*
+            Styling for an individual sand grain.
+            These are small, circular divs that will be animated to fall and swirl.
+        */
+        .grain {
+            position: absolute;
+            border-radius: 50%; /* Makes the div perfectly circular */
+            /* Radial gradient for subtle depth and a slightly varied appearance */
+            background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.7), var(--grain-color));
+            opacity: 0.8; /* Slight transparency for layering and blending */
+            will-change: transform, opacity; /* Optimize for animation performance */
+            pointer-events: none; /* Ensure grains don't interfere with interaction */
+
+            /* Default animation properties, duration and delay set by JavaScript */
+            animation: sandFlow var(--duration) linear infinite;
+        }
+
+        /*
+            Keyframe animation for the sand grain flow.
+            It simulates falling, horizontal drift, and subtle swirling motion.
+            The timing function 'linear' is used for constant falling speed,
+            but the path itself creates variation.
+        */
+        @keyframes sandFlow {
+            0% {
+                transform: translate(var(--initial-x), -10vh) scale(var(--initial-scale));
+                opacity: 0; /* Start above screen and faded out */
+            }
+            10% {
+                opacity: 0.8; /* Fade in as it enters */
+            }
+            50% {
+                transform: translate(var(--mid-x), 50vh) scale(var(--mid-scale));
+                opacity: 0.9; /* Slightly more opaque mid-flow */
+            }
+            90% {
+                opacity: 0.8; /* Maintain opacity until near end */
+            }
+            100% {
+                transform: translate(var(--final-x), 110vh) scale(var(--final-scale));
+                opacity: 0; /* Fall past screen and fade out */
+            }
+        }
+
+        /* Responsive adjustments for smaller screens (e.g., mobile devices) */
+        @media (max-width: 768px) {
+            .grain {
+                filter: blur(0.2px); /* Slightly less blur on mobile */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="grain-container">
+        <!-- Sand grains will be dynamically added here by JavaScript -->
+    </div>
+
+    <script>
+        const grainContainer = document.querySelector('.grain-container');
+
+        // Earthy tones for sand grains
+        const colors = [
+            '#b8860b', // DarkGoldenrod (golden tan)
+            '#8b4513', // SaddleBrown (soft brown)
+            '#cc7722', // Ochre-like
+            '#d2b48c', // Tan
+            '#cd853f'  // Peru
+        ];
+
+        const NUM_GRAINS = 500; // Number of sand grains to simulate simultaneously
+        const MIN_DURATION = 6; // seconds
+        const MAX_DURATION = 8; // seconds
+        const MIN_SIZE = 2; // pixels
+        const MAX_SIZE = 4; // pixels
+
+        /**
+         * Creates and animates a single sand grain.
+         */
+        function createGrain() {
+            const grain = document.createElement('div');
+            grain.classList.add('grain');
+
+            // Randomize properties for each grain
+            const size = Math.random() * (MAX_SIZE - MIN_SIZE) + MIN_SIZE;
+            const duration = Math.random() * (MAX_DURATION - MIN_DURATION) + MIN_DURATION;
+            const delay = Math.random() * duration; // Negative delay to start at various points in animation
+
+            // Randomize color
+            const color = colors[Math.floor(Math.random() * colors.length)];
+
+            // Randomize animation path for "swirling" effect
+            const initialX = `${Math.random() * 100}vw`;
+            const midX = `${(Math.random() * 60 + 20)}vw`; // Between 20% and 80% viewport width
+            const finalX = `${Math.random() * 100}vw`;
+
+            // Randomize initial/final scales for subtle depth changes
+            const initialScale = 0.8 + Math.random() * 0.4; // 0.8 to 1.2
+            const midScale = 0.8 + Math.random() * 0.4;
+            const finalScale = 0.8 + Math.random() * 0.4;
+
+            grain.style.width = `${size}px`;
+            grain.style.height = `${size}px`;
+            grain.style.setProperty('--grain-color', color);
+            grain.style.setProperty('--duration', `${duration}s`);
+            grain.style.setProperty('--initial-x', initialX);
+            grain.style.setProperty('--mid-x', midX);
+            grain.style.setProperty('--final-x', finalX);
+            grain.style.setProperty('--initial-scale', initialScale);
+            grain.style.setProperty('--mid-scale', midScale);
+            grain.style.setProperty('--final-scale', finalScale);
+            grain.style.animationDelay = `-${delay}s`;
+
+            grainContainer.appendChild(grain);
+
+            // When an animation iteration ends (i.e., the grain finishes its loop),
+            // remove it and create a new one to maintain the continuous flow.
+            grain.addEventListener('animationiteration', () => {
+                // Reset properties for a new cycle
+                const newSize = Math.random() * (MAX_SIZE - MIN_SIZE) + MIN_SIZE;
+                const newDuration = Math.random() * (MAX_DURATION - MIN_DURATION) + MIN_DURATION;
+                const newInitialX = `${Math.random() * 100}vw`;
+                const newMidX = `${(Math.random() * 60 + 20)}vw`;
+                const newFinalX = `${Math.random() * 100}vw`;
+                const newInitialScale = 0.8 + Math.random() * 0.4;
+                const newMidScale = 0.8 + Math.random() * 0.4;
+                const newFinalScale = 0.8 + Math.random() * 0.4;
+                const newColor = colors[Math.floor(Math.random() * colors.length)];
+
+                grain.style.width = `${newSize}px`;
+                grain.style.height = `${newSize}px`;
+                grain.style.setProperty('--grain-color', newColor);
+                grain.style.setProperty('--duration', `${newDuration}s`);
+                grain.style.setProperty('--initial-x', newInitialX);
+                grain.style.setProperty('--mid-x', newMidX);
+                grain.style.setProperty('--final-x', newFinalX);
+                grain.style.setProperty('--initial-scale', newInitialScale);
+                grain.style.setProperty('--mid-scale', newMidScale);
+                grain.style.setProperty('--final-scale', newFinalScale);
+                // Reset animation by temporarily setting play-state to paused, then running
+                // This ensures it restarts from the beginning of its new animation cycle
+                grain.style.animationPlayState = 'paused';
+                grain.style.animationDelay = '0s'; // Make it start immediately after reset
+                requestAnimationFrame(() => { // Use rAF to ensure style changes apply before unpausing
+                    grain.style.animationPlayState = 'running';
+                });
+            });
+        }
+
+        /**
+         * Initializes the animation by creating the initial set of sand grains.
+         */
+        function initSandFlow() {
+            for (let i = 0; i < NUM_GRAINS; i++) {
+                createGrain();
+            }
+        }
+
+        // Start the sand flow animation when the window has fully loaded
+        window.onload = initSandFlow;
+    </script>
+</body>
+</html>
